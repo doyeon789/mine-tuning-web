@@ -18,6 +18,18 @@
                 <p class="empty-history">No chat history yet.</p>
             {% endfor %}
         </nav>
+
+        <div class="account-panel">
+            <span class="account-name">{{ request.user.username }}</span>
+            <form action="{% url 'accounts:logout' %}" method="post">
+                {% csrf_token %}
+                <button class="small-button account-button" type="submit">Logout</button>
+            </form>
+            <form action="{% url 'accounts:delete' %}" method="post" data-confirm="Delete your account? This cannot be undone.">
+                {% csrf_token %}
+                <button class="danger-button account-button" type="submit">Delete Account</button>
+            </form>
+        </div>
     </aside>
 
     <main class="chat-main">

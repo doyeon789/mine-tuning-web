@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'accounts',
     'mine_chat',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -117,6 +118,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+
+LOGIN_URL = 'accounts:login'
+LOGIN_REDIRECT_URL = 'mine_chat:index'
+LOGOUT_REDIRECT_URL = 'accounts:login'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

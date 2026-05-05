@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<main class="auth-page">
+    <a class="auth-brand" href="{% url 'accounts:login' %}">
+        <span>MINE_TUNING</span>
+    </a>
+
+    <section class="auth-layout">
+        <div class="auth-form-panel">
+            <h1>Built for Accuracy.<br>Built for STEM.</h1>
+            <p class="auth-subtitle">로그인해서 AI 채팅을 시작하세요</p>
+
+            <form class="auth-form" action="{% url 'accounts:login' %}" method="post">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="form-errors">{{ form.non_field_errors }}</div>
+                {% endif %}
+                <label for="{{ form.username.id_for_label }}">아이디</label>
+                {{ form.username }}
+                <label for="{{ form.password.id_for_label }}">비밀번호</label>
+                {{ form.password }}
+                <button class="auth-primary" type="submit">로그인</button>
+            </form>
+
+            <p class="auth-switch">
+                계정이 없나요?
+                <a href="{% url 'accounts:signup' %}">회원가입</a>
+            </p>
+        </div>
+
+        <div class="auth-visual" aria-hidden="true">
+            <img class="auth-visual-image" src="{% static 'images/auth/logo.webp' %}" alt="">
+        </div>
+    </section>
+</main>
+{% endblock content %}
