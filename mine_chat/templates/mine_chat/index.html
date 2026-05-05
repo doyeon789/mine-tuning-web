@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="app-shell" data-chat-app>
+    <aside class="sidebar">
+        <h1 class="brand">Mine Tuning Chat</h1>
+        <form action="{% url 'mine_chat:session_create' %}" method="post">
+            {% csrf_token %}
+            <button class="new-chat" type="submit">New Chat</button>
+        </form>
+
+        <nav class="history" aria-label="Chat history">
+            {% for session in sessions %}
+                <a class="history-link{% if active_session.pk == session.pk %} active{% endif %}" href="{% url 'mine_chat:session_detail' session.pk %}">
+                    {{ session.title }}
+                </a>
+            {% empty %}
+                <p class="empty-history">No chat history yet.</p>
+            {% endfor %}
+        </nav>
+    </aside>
+
+    <main class="chat-main">
+        {% if active_session %}
+            <header class="chat-header">
+                <form class="title-form" action="{% url 'mine_chat:session_update' active_session.pk %}" method="post">
+                    {% csrf_token %}
+                    {{ session_form.title }}
+                    <button class="small-button" type="submit">Save</button>
+                </form>
+                <form action="{% url 'mine_chat:session_delete' active_session.pk %}" method="post" data-confirm="Delete this chat?">
+                    {% csrf_token %}
+                    <button class="danger-button" type="submit">Delete</button>
+                </form>
+            </header>
+
+            <section class="messages" aria-label="Messages" data-message-scroll>
+                <div class="message-list">
+                    {% for message in active_session.messages.all %}
+                        <article class="message {{ message.role }}">
+                            <div class="message-content">{{ message.content }}</div>
+                            <div class="message-meta">
+                                <span>{{ message.get_role_display }}</span>
+                                <span>{{ message.created_at|date:"Y-m-d H:i" }}</span>
+                                <form action="{% url 'mine_chat:message_delete' message.pk %}" method="post" data-confirm="Delete this message?">
+                                    {% csrf_token %}
+                                    <button class="delete-message" type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </article>
+                    {% empty %}
+                        <div class="empty-state">Send a message to start chatting.</div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <form class="composer" action="{% url 'mine_chat:message_create' active_session.pk %}" method="post">
+                {% csrf_token %}
+                <div class="composer-inner">
+                    {{ message_form.content }}
+                    <button class="send-button" type="submit">Send</button>
+                </div>
+            </form>
+        {% else %}
+            <section class="empty-state">
+                <form action="{% url 'mine_chat:session_create' %}" method="post">
+                    {% csrf_token %}
+                    <button class="new-chat" type="submit">Create First Chat</button>
+                </form>
+            </section>
+        {% endif %}
+    </main>
+</div>
+{% endblock content %}
