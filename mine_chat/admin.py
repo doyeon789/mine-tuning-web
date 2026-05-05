@@ -21,5 +21,3 @@ class ChatMessageAdmin(admin.ModelAdmin):
     list_display = ("session", "role", "created_at")
     list_filter = ("role", "created_at")
     search_fields = ("content", "session__title")
-
-# Register your models here.

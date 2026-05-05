@@ -10,7 +10,7 @@ class ChatSession(models.Model):
         null=True,
         blank=True,
     )
-    title = models.CharField(max_length=120, default="New chat")
+    title = models.CharField(max_length=120, default="새 채팅")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -23,8 +23,8 @@ class ChatSession(models.Model):
 
 class ChatMessage(models.Model):
     class Role(models.TextChoices):
-        USER = "user", "User"
-        ASSISTANT = "assistant", "Assistant"
+        USER = "user", "사용자"
+        ASSISTANT = "assistant", "AI"
 
     session = models.ForeignKey(
         ChatSession,

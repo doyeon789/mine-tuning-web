@@ -3,65 +3,85 @@
 {% block content %}
 <div class="app-shell" data-chat-app>
     <aside class="sidebar">
-        <h1 class="brand">Mine Tuning Chat</h1>
-        <form action="{% url 'mine_chat:session_create' %}" method="post">
-            {% csrf_token %}
-            <button class="new-chat" type="submit">New Chat</button>
-        </form>
+        <div class="sidebar-top">
+            <h1 class="brand">MINE_TUNING</h1>
+            <form action="{% url 'mine_chat:session_create' %}" method="post">
+                {% csrf_token %}
+                <button class="new-chat" type="submit">+ &#49352; &#52292;&#54021;</button>
+            </form>
+        </div>
 
-        <nav class="history" aria-label="Chat history">
-            {% for session in sessions %}
-                <a class="history-link{% if active_session.pk == session.pk %} active{% endif %}" href="{% url 'mine_chat:session_detail' session.pk %}">
-                    {{ session.title }}
-                </a>
-            {% empty %}
-                <p class="empty-history">No chat history yet.</p>
-            {% endfor %}
-        </nav>
+        <section class="history-section">
+            <h2 class="history-title">&#52572;&#44540;</h2>
+            <nav class="history" aria-label="&#52292;&#54021; &#44592;&#47197;">
+                {% for session in sessions %}
+                    <div class="history-item{% if active_session.pk == session.pk %} active{% endif %}" data-history-item>
+                        <a class="history-link" href="{% url 'mine_chat:session_detail' session.pk %}">
+                            {{ session.title }}
+                        </a>
+                        <button class="history-menu-button" type="button" aria-label="&#52292;&#54021; &#47700;&#45684;" data-history-menu-button>...</button>
+                        <div class="history-menu" data-history-menu hidden>
+                            <form class="history-rename-form" action="{% url 'mine_chat:session_update' session.pk %}" method="post">
+                                {% csrf_token %}
+                                <input class="history-rename-input" type="text" name="title" value="{{ session.title }}" required>
+                                <button class="history-menu-action" type="submit">&#51060;&#47492; &#49688;&#51221;</button>
+                            </form>
+                            <form action="{% url 'mine_chat:session_delete' session.pk %}" method="post" data-confirm="&#51060; &#52292;&#54021;&#51012; &#49325;&#51228;&#54624;&#44620;&#50836;?">
+                                {% csrf_token %}
+                                <button class="history-menu-action danger" type="submit">&#49325;&#51228;</button>
+                            </form>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="empty-history">&#50500;&#51649; &#52292;&#54021; &#44592;&#47197;&#51060; &#50630;&#49845;&#45768;&#45796;.</p>
+                {% endfor %}
+            </nav>
+        </section>
 
         <div class="account-panel">
             <span class="account-name">{{ request.user.username }}</span>
-            <form action="{% url 'accounts:logout' %}" method="post">
+            <form action="{% url 'accounts:logout' %}" method="post" data-confirm="&#47196;&#44536;&#50500;&#50883;&#54624;&#44620;&#50836;?">
                 {% csrf_token %}
-                <button class="small-button account-button" type="submit">Logout</button>
+                <button class="small-button account-button" type="submit">&#47196;&#44536;&#50500;&#50883;</button>
             </form>
-            <form action="{% url 'accounts:delete' %}" method="post" data-confirm="Delete your account? This cannot be undone.">
+            <form action="{% url 'accounts:delete' %}" method="post" data-confirm="&#44228;&#51221;&#51012; &#49325;&#51228;&#54624;&#44620;&#50836;? &#44228;&#51221; &#45936;&#51060;&#53552;&#44032; &#47784;&#46160; &#49325;&#51228;&#46121;&#45768;&#45796;.">
                 {% csrf_token %}
-                <button class="danger-button account-button" type="submit">Delete Account</button>
+                <button class="danger-button account-button" type="submit">&#54924;&#50896;&#53448;&#53748;</button>
             </form>
         </div>
     </aside>
 
     <main class="chat-main">
         {% if active_session %}
-            <header class="chat-header">
-                <form class="title-form" action="{% url 'mine_chat:session_update' active_session.pk %}" method="post">
-                    {% csrf_token %}
-                    {{ session_form.title }}
-                    <button class="small-button" type="submit">Save</button>
-                </form>
-                <form action="{% url 'mine_chat:session_delete' active_session.pk %}" method="post" data-confirm="Delete this chat?">
-                    {% csrf_token %}
-                    <button class="danger-button" type="submit">Delete</button>
-                </form>
-            </header>
+            <div class="chat-topbar">
+                <span>{{ active_session.title }}</span>
+            </div>
 
-            <section class="messages" aria-label="Messages" data-message-scroll>
+            <section class="messages" aria-label="&#47700;&#49884;&#51648;" data-message-scroll>
                 <div class="message-list">
                     {% for message in active_session.messages.all %}
                         <article class="message {{ message.role }}">
-                            <div class="message-content">{{ message.content }}</div>
+                            {% if message.role == "user" %}
+                                <form class="message-edit-form" action="{% url 'mine_chat:message_update' message.pk %}" method="post" data-message-form>
+                                    {% csrf_token %}
+                                    <div class="message-content" data-message-text>{{ message.content }}</div>
+                                    <textarea class="message-edit-input" name="content" rows="2" required hidden>{{ message.content }}</textarea>
+                                    <div class="message-actions">
+                                        <button class="message-action-button" type="button" data-edit-message>&#49688;&#51221;</button>
+                                        <button class="message-edit-button" type="submit" hidden>&#51200;&#51109;</button>
+                                        <button class="message-cancel-button" type="button" data-cancel-edit hidden>&#52712;&#49548;</button>
+                                    </div>
+                                </form>
+                            {% else %}
+                                <div class="message-content">{{ message.content }}</div>
+                            {% endif %}
                             <div class="message-meta">
                                 <span>{{ message.get_role_display }}</span>
                                 <span>{{ message.created_at|date:"Y-m-d H:i" }}</span>
-                                <form action="{% url 'mine_chat:message_delete' message.pk %}" method="post" data-confirm="Delete this message?">
-                                    {% csrf_token %}
-                                    <button class="delete-message" type="submit">Delete</button>
-                                </form>
                             </div>
                         </article>
                     {% empty %}
-                        <div class="empty-state">Send a message to start chatting.</div>
+                        <div class="empty-state">&#47700;&#49884;&#51648;&#47484; &#51077;&#47141;&#54616;&#47732; &#45824;&#54868;&#44032; &#49884;&#51089;&#46121;&#45768;&#45796;.</div>
                     {% endfor %}
                 </div>
             </section>
@@ -70,14 +90,14 @@
                 {% csrf_token %}
                 <div class="composer-inner">
                     {{ message_form.content }}
-                    <button class="send-button" type="submit">Send</button>
+                    <button class="send-button" type="submit" aria-label="&#51204;&#49569;">&#8593;</button>
                 </div>
             </form>
         {% else %}
             <section class="empty-state">
                 <form action="{% url 'mine_chat:session_create' %}" method="post">
                     {% csrf_token %}
-                    <button class="new-chat" type="submit">Create First Chat</button>
+                    <button class="new-chat" type="submit">&#52395; &#52292;&#54021; &#47564;&#46308;&#44592;</button>
                 </form>
             </section>
         {% endif %}
