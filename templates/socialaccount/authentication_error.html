@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<main class="auth-page">
+    <a class="auth-brand" href="{% url 'accounts:login' %}">
+        <span>MINE_TUNING</span>
+    </a>
+
+    <section class="auth-layout">
+        <div class="auth-form-panel">
+            <h1>OAuth 로그인에<br>실패했습니다.</h1>
+            <p class="auth-subtitle">Google OAuth 설정과 redirect URI를 확인한 뒤 다시 시도하세요.</p>
+
+            <a class="auth-oauth-button" href="{% url 'accounts:login' %}">
+                로그인 화면으로 돌아가기
+            </a>
+        </div>
+
+        <div class="auth-visual" aria-hidden="true">
+            <img class="auth-visual-image" src="{% static 'images/auth/logo.webp' %}" alt="">
+        </div>
+    </section>
+</main>
+{% endblock content %}

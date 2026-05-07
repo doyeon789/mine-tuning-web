@@ -502,6 +502,54 @@ a {
     text-align: left;
 }
 
+.auth-oauth-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 48px;
+    border: 1px solid #d9dde4;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #1d2430;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.auth-oauth-button:hover {
+    background: #f4f5f7;
+}
+
+.auth-oauth-disabled {
+    width: 100%;
+    border: 1px solid #f0c0ba;
+    border-radius: 8px;
+    background: #fff1ef;
+    color: #a33a2a;
+    padding: 13px 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 18px 0;
+    color: #8a94a1;
+    font-size: 12px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #e4e8ee;
+}
+
 .auth-form label {
     color: #4f5d6a;
     font-size: 13px;

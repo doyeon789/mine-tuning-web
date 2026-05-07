@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<main class="auth-page">
+    <a class="auth-brand" href="{% url 'accounts:login' %}">
+        <span>MINE_TUNING</span>
+    </a>
+
+    <section class="auth-layout">
+        <div class="auth-form-panel">
+            {% if process == "connect" %}
+                <h1>{{ provider.name }} 계정을<br>연결할까요?</h1>
+                <p class="auth-subtitle">현재 계정에 외부 로그인 수단을 추가합니다.</p>
+            {% else %}
+                <h1>{{ provider.name }}로<br>계속할까요?</h1>
+                <p class="auth-subtitle">외부 계정 인증 후 MINE_TUNING으로 돌아옵니다.</p>
+            {% endif %}
+
+            <form class="auth-form" method="post">
+                {% csrf_token %}
+                <button class="auth-primary" type="submit">계속하기</button>
+            </form>
+
+            <p class="auth-switch">
+                <a href="{% url 'accounts:login' %}">로그인 화면으로 돌아가기</a>
+            </p>
+        </div>
+
+        <div class="auth-visual" aria-hidden="true">
+            <img class="auth-visual-image" src="{% static 'images/auth/logo.webp' %}" alt="">
+        </div>
+    </section>
+</main>
+{% endblock content %}
