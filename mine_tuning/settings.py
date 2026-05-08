@@ -61,6 +61,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.kakao',
+    'allauth.socialaccount.providers.naver',
 ]
 
 MIDDLEWARE = [
@@ -171,6 +173,20 @@ SOCIALACCOUNT_PROVIDERS = {
             'access_type': 'online',
         },
         'OAUTH_PKCE_ENABLED': True,
+    },
+    'kakao': {
+        'APP': {
+            'client_id': os.getenv('KAKAO_OAUTH_CLIENT_ID', ''),
+            'secret': os.getenv('KAKAO_OAUTH_CLIENT_SECRET', ''),
+            'key': '',
+        },
+    },
+    'naver': {
+        'APP': {
+            'client_id': os.getenv('NAVER_OAUTH_CLIENT_ID', ''),
+            'secret': os.getenv('NAVER_OAUTH_CLIENT_SECRET', ''),
+            'key': '',
+        },
     },
 }
 

@@ -502,6 +502,11 @@ a {
     text-align: left;
 }
 
+.auth-oauth-list {
+    display: grid;
+    gap: 10px;
+}
+
 .auth-oauth-button {
     display: inline-flex;
     align-items: center;
@@ -519,6 +524,26 @@ a {
 
 .auth-oauth-button:hover {
     background: #f4f5f7;
+}
+
+.auth-oauth-kakao {
+    border-color: #fee500;
+    background: #fee500;
+    color: #191919;
+}
+
+.auth-oauth-kakao:hover {
+    background: #f4dc00;
+}
+
+.auth-oauth-naver {
+    border-color: #03c75a;
+    background: #03c75a;
+    color: #ffffff;
+}
+
+.auth-oauth-naver:hover {
+    background: #02b350;
 }
 
 .auth-oauth-disabled {
