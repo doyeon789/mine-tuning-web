@@ -59,6 +59,28 @@ document.addEventListener("DOMContentLoaded", () => {
     if (messageInput) {
         messageInput.focus();
         messageInput.setSelectionRange(messageInput.value.length, messageInput.value.length);
+
+        document.addEventListener("keydown", (event) => {
+            const target = event.target;
+            const isEditableTarget =
+                target instanceof HTMLInputElement ||
+                target instanceof HTMLTextAreaElement ||
+                target instanceof HTMLSelectElement ||
+                target.isContentEditable;
+
+            if (
+                isEditableTarget ||
+                event.ctrlKey ||
+                event.metaKey ||
+                event.altKey ||
+                event.key.length !== 1
+            ) {
+                return;
+            }
+
+            messageInput.focus();
+            messageInput.setSelectionRange(messageInput.value.length, messageInput.value.length);
+        });
     }
 
     document.querySelectorAll("[data-edit-message]").forEach((button) => {
