@@ -48,6 +48,19 @@ class ChatViewsTests(TestCase):
         self.assertEqual(session.messages.first().role, ChatMessage.Role.USER)
         self.assertEqual(session.messages.first().content, "Hello")
 
+    def test_create_session_with_content_starts_chat(self):
+        response = self.client.post(
+            reverse("mine_chat:session_create"),
+            {"content": "First message"},
+        )
+
+        session = ChatSession.objects.get()
+        self.assertRedirects(response, reverse("mine_chat:session_detail", args=[session.pk]))
+        self.assertEqual(session.owner, self.user)
+        self.assertEqual(session.messages.count(), 2)
+        self.assertEqual(session.messages.first().role, ChatMessage.Role.USER)
+        self.assertEqual(session.messages.first().content, "First message")
+
     def test_sessions_order_by_latest_message_not_rename_time(self):
         older_session = ChatSession.objects.create(owner=self.user, title="Older")
         newer_session = ChatSession.objects.create(owner=self.user, title="Newer")

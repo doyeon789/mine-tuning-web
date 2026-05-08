@@ -96,10 +96,13 @@
                 </div>
             </form>
         {% else %}
-            <section class="empty-state">
-                <form action="{% url 'mine_chat:session_create' %}" method="post">
+            <section class="first-chat">
+                <form class="composer first-chat-composer" action="{% url 'mine_chat:session_create' %}" method="post">
                     {% csrf_token %}
-                    <button class="new-chat" type="submit">&#52395; &#52292;&#54021; &#47564;&#46308;&#44592;</button>
+                    <div class="composer-inner">
+                        {{ message_form.content }}
+                        <button class="send-button" type="submit" aria-label="&#51204;&#49569;">&#8593;</button>
+                    </div>
                 </form>
             </section>
         {% endif %}

@@ -78,6 +78,15 @@ def session_create(request):
         session = ChatSession.objects.create(owner=request.user)
         session.title = f"새 채팅 {session.pk}"
         session.save(update_fields=["title"])
+
+    form = ChatMessageForm(request.POST)
+    if "content" in request.POST and form.is_valid():
+        message = form.save(commit=False)
+        message.session = session
+        message.role = ChatMessage.Role.USER
+        message.save()
+        _create_assistant_response(session)
+
     return redirect("mine_chat:session_detail", pk=session.pk)
 
 
