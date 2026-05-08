@@ -55,6 +55,12 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    const messageInput = document.querySelector(".message-input");
+    if (messageInput) {
+        messageInput.focus();
+        messageInput.setSelectionRange(messageInput.value.length, messageInput.value.length);
+    }
+
     document.querySelectorAll("[data-edit-message]").forEach((button) => {
         button.addEventListener("click", () => {
             const form = button.closest("[data-message-form]");
