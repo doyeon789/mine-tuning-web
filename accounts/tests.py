@@ -17,6 +17,25 @@ class AccountViewsTests(TestCase):
         self.assertRedirects(response, reverse("mine_chat:index"))
         self.assertTrue(get_user_model().objects.filter(username="newuser").exists())
 
+    def test_signup_duplicate_username_uses_korean_label(self):
+        get_user_model().objects.create_user(
+            username="tester",
+            password="StrongPass123!",
+        )
+
+        response = self.client.post(
+            reverse("accounts:signup"),
+            {
+                "username": "tester",
+                "password1": "StrongPass123!",
+                "password2": "StrongPass123!",
+            },
+        )
+
+        self.assertContains(response, "아이디")
+        self.assertContains(response, "이미 사용 중인 아이디입니다.")
+        self.assertNotContains(response, "A user with that username already exists.")
+
     def test_login_and_logout(self):
         get_user_model().objects.create_user(
             username="tester",

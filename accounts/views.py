@@ -1,13 +1,14 @@
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
+from .forms import AccountAuthenticationForm, AccountCreationForm
+
 
 class AccountLoginView(LoginView):
-    authentication_form = AuthenticationForm
+    authentication_form = AccountAuthenticationForm
     template_name = "accounts/login.html"
     redirect_authenticated_user = True
 
@@ -17,13 +18,13 @@ def signup(request):
         return redirect("mine_chat:index")
 
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = AccountCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user, backend="django.contrib.auth.backends.ModelBackend")
             return redirect("mine_chat:index")
     else:
-        form = UserCreationForm()
+        form = AccountCreationForm()
 
     return render(request, "accounts/signup.html", {"form": form})
 
