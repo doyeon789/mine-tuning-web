@@ -327,6 +327,7 @@ a {
     display: flex;
     gap: 8px;
     justify-content: flex-end;
+    white-space: nowrap;
 }
 
 .message-action-button,
@@ -356,10 +357,16 @@ a {
 
 .message-meta {
     display: flex;
+    justify-content: space-between;
     gap: 8px;
     align-items: center;
     color: #747474;
     font-size: 14px;
+    white-space: nowrap;
+}
+
+.message.assistant .message-meta {
+    justify-content: flex-start;
 }
 
 .composer {

@@ -66,19 +66,21 @@
                                     {% csrf_token %}
                                     <div class="message-content" data-message-text>{{ message.content }}</div>
                                     <textarea class="message-edit-input" name="content" rows="2" required hidden>{{ message.content }}</textarea>
-                                    <div class="message-actions">
-                                        <button class="message-action-button" type="button" data-edit-message>&#49688;&#51221;</button>
-                                        <button class="message-edit-button" type="submit" hidden>&#51200;&#51109;</button>
-                                        <button class="message-cancel-button" type="button" data-cancel-edit hidden>&#52712;&#49548;</button>
+                                    <div class="message-meta">
+                                        <span>{{ message.created_at|date:"Y-m-d H:i" }}</span>
+                                        <div class="message-actions">
+                                            <button class="message-action-button" type="button" data-edit-message>&#49688;&#51221;</button>
+                                            <button class="message-edit-button" type="submit" hidden>&#51200;&#51109;</button>
+                                            <button class="message-cancel-button" type="button" data-cancel-edit hidden>&#52712;&#49548;</button>
+                                        </div>
                                     </div>
                                 </form>
                             {% else %}
                                 <div class="message-content">{{ message.content }}</div>
+                                <div class="message-meta">
+                                    <span>{{ message.created_at|date:"Y-m-d H:i" }}</span>
+                                </div>
                             {% endif %}
-                            <div class="message-meta">
-                                <span>{{ message.get_role_display }}</span>
-                                <span>{{ message.created_at|date:"Y-m-d H:i" }}</span>
-                            </div>
                         </article>
                     {% empty %}
                         <div class="empty-state">&#47700;&#49884;&#51648;&#47484; &#51077;&#47141;&#54616;&#47732; &#45824;&#54868;&#44032; &#49884;&#51089;&#46121;&#45768;&#45796;.</div>
