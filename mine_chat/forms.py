@@ -10,7 +10,7 @@ class ChatSessionForm(forms.ModelForm):
         widgets = {
             "title": forms.TextInput(
                 attrs={
-                    "placeholder": "채팅 제목",
+                    "placeholder": "Chat title",
                     "class": "text-input",
                 }
             )
@@ -24,7 +24,7 @@ class ChatMessageForm(forms.ModelForm):
         widgets = {
             "content": forms.Textarea(
                 attrs={
-                    "placeholder": "메시지를 입력하세요",
+                    "placeholder": "Ask anything",
                     "rows": 2,
                     "class": "message-input",
                 }

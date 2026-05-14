@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, DateTimeField, Max
+from django.db.models import DateTimeField, Max
 from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -9,8 +9,9 @@ from .forms import ChatMessageForm, ChatSessionForm
 from .models import ChatMessage, ChatSession
 
 ASSISTANT_PLACEHOLDER = (
-    "아직 LLM API가 연결되지 않았습니다. 나중에 파인튜닝 모델 응답으로 교체하면 됩니다."
+    "The LLM API is not connected yet. Replace this with a model response later."
 )
+SESSION_TITLE_MAX_LENGTH = 32
 
 
 def _user_sessions(user):
@@ -51,8 +52,18 @@ def _delete_messages_after(user_message):
     ).delete()
 
 
+def _make_session_title(content):
+    title = " ".join(content.split())
+    if len(title) <= SESSION_TITLE_MAX_LENGTH:
+        return title
+    return title[: SESSION_TITLE_MAX_LENGTH - 3].rstrip() + "..."
+
+
 @login_required
 def index(request):
+    if request.GET.get("new") == "1":
+        return render(request, "mine_chat/index.html", _chat_context(request.user))
+
     first_session = _user_sessions(request.user).first()
     if first_session:
         return redirect("mine_chat:session_detail", pk=first_session.pk)
@@ -68,24 +79,19 @@ def session_detail(request, pk):
 @require_POST
 @login_required
 def session_create(request):
-    session = (
-        _user_sessions(request.user)
-        .annotate(message_count=Count("messages"))
-        .filter(message_count=0)
-        .first()
-    )
-    if session is None:
-        session = ChatSession.objects.create(owner=request.user)
-        session.title = f"새 채팅 {session.pk}"
-        session.save(update_fields=["title"])
-
     form = ChatMessageForm(request.POST)
-    if "content" in request.POST and form.is_valid():
-        message = form.save(commit=False)
-        message.session = session
-        message.role = ChatMessage.Role.USER
-        message.save()
-        _create_assistant_response(session)
+    if "content" not in request.POST or not form.is_valid():
+        return redirect(f"{reverse('mine_chat:index')}?new=1")
+
+    message = form.save(commit=False)
+    session = ChatSession.objects.create(
+        owner=request.user,
+        title=_make_session_title(message.content),
+    )
+    message.session = session
+    message.role = ChatMessage.Role.USER
+    message.save()
+    _create_assistant_response(session)
 
     return redirect("mine_chat:session_detail", pk=session.pk)
 

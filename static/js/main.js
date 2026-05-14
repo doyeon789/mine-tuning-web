@@ -86,11 +86,13 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("[data-edit-message]").forEach((button) => {
         button.addEventListener("click", () => {
             const form = button.closest("[data-message-form]");
+            const message = form.closest(".message");
             const text = form.querySelector("[data-message-text]");
             const textarea = form.querySelector("textarea");
             const saveButton = form.querySelector(".message-edit-button");
             const cancelButton = form.querySelector(".message-cancel-button");
 
+            message.classList.add("editing");
             text.hidden = true;
             textarea.hidden = false;
             button.hidden = true;
@@ -104,11 +106,13 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("[data-cancel-edit]").forEach((button) => {
         button.addEventListener("click", () => {
             const form = button.closest("[data-message-form]");
+            const message = form.closest(".message");
             const text = form.querySelector("[data-message-text]");
             const textarea = form.querySelector("textarea");
             const editButton = form.querySelector(".message-action-button");
             const saveButton = form.querySelector(".message-edit-button");
 
+            message.classList.remove("editing");
             textarea.value = textarea.defaultValue;
             textarea.hidden = true;
             text.hidden = false;

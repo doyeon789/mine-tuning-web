@@ -1,11 +1,12 @@
-from django.contrib.auth import get_user_model
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
 from datetime import timedelta
 
+from django.contrib.auth import get_user_model
+from django.test import TestCase
+from django.urls import reverse
+from django.utils import timezone
+
 from .models import ChatMessage, ChatSession
-from .views import _user_sessions
+from .views import SESSION_TITLE_MAX_LENGTH, _make_session_title, _user_sessions
 
 
 class ChatViewsTests(TestCase):
@@ -16,24 +17,21 @@ class ChatViewsTests(TestCase):
         )
         self.client.login(username="tester", password="StrongPass123!")
 
-    def test_create_session_redirects_to_detail(self):
-        response = self.client.post(reverse("mine_chat:session_create"))
+    def test_new_chat_page_does_not_create_session(self):
+        ChatSession.objects.create(owner=self.user, title="Existing")
 
-        session = ChatSession.objects.get()
-        self.assertEqual(session.owner, self.user)
-        self.assertEqual(session.title, f"새 채팅 {session.pk}")
-        self.assertRedirects(response, reverse("mine_chat:session_detail", args=[session.pk]))
+        response = self.client.get(reverse("mine_chat:index"), {"new": "1"})
 
-    def test_create_session_reuses_existing_empty_session(self):
-        empty_session = ChatSession.objects.create(owner=self.user, title="새 채팅")
-
-        response = self.client.post(reverse("mine_chat:session_create"))
-
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Where should we begin?")
         self.assertEqual(ChatSession.objects.count(), 1)
-        self.assertRedirects(
-            response,
-            reverse("mine_chat:session_detail", args=[empty_session.pk]),
-        )
+        self.assertNotContains(response, '<div class="chat-topbar">', html=False)
+
+    def test_empty_session_create_redirects_to_new_chat_without_creating_session(self):
+        response = self.client.post(reverse("mine_chat:session_create"))
+
+        self.assertEqual(ChatSession.objects.count(), 0)
+        self.assertRedirects(response, f"{reverse('mine_chat:index')}?new=1")
 
     def test_create_message_adds_user_and_placeholder_assistant_message(self):
         session = ChatSession.objects.create(owner=self.user, title="Test chat")
@@ -57,9 +55,28 @@ class ChatViewsTests(TestCase):
         session = ChatSession.objects.get()
         self.assertRedirects(response, reverse("mine_chat:session_detail", args=[session.pk]))
         self.assertEqual(session.owner, self.user)
+        self.assertEqual(session.title, "First message")
         self.assertEqual(session.messages.count(), 2)
         self.assertEqual(session.messages.first().role, ChatMessage.Role.USER)
         self.assertEqual(session.messages.first().content, "First message")
+
+    def test_session_title_is_based_on_first_question(self):
+        response = self.client.post(
+            reverse("mine_chat:session_create"),
+            {"content": "  다이아   캐는법\n알려줘  "},
+        )
+
+        session = ChatSession.objects.get()
+        self.assertRedirects(response, reverse("mine_chat:session_detail", args=[session.pk]))
+        self.assertEqual(session.title, "다이아 캐는법 알려줘")
+
+    def test_session_title_is_truncated_to_model_limit(self):
+        long_question = "가" * 140
+
+        title = _make_session_title(long_question)
+
+        self.assertEqual(len(title), SESSION_TITLE_MAX_LENGTH)
+        self.assertTrue(title.endswith("..."))
 
     def test_sessions_order_by_latest_message_not_rename_time(self):
         older_session = ChatSession.objects.create(owner=self.user, title="Older")

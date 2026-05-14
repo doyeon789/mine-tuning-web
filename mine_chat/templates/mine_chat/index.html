@@ -5,9 +5,9 @@
     <aside class="sidebar">
         <div class="sidebar-top">
             <h1 class="brand">MINE_TUNING</h1>
-            <form action="{% url 'mine_chat:session_create' %}" method="post">
-                {% csrf_token %}
-                <button class="new-chat" type="submit">+ &#49352; &#52292;&#54021;</button>
+            <form action="{% url 'mine_chat:index' %}" method="get">
+                <input type="hidden" name="new" value="1">
+                <button class="new-chat" type="submit"><span class="nav-icon">+</span><span>&#49352; &#52292;&#54021;</span></button>
             </form>
         </div>
 
@@ -39,6 +39,10 @@
         </section>
 
         <div class="account-panel">
+            <div>
+                <strong>&#45208;&#50640;&#44172; &#47582;&#45716; &#45824;&#54868;</strong>
+                <p>&#51200;&#51109;&#46108; &#52292;&#54021;&#51012; &#44592;&#48152;&#51004;&#47196; &#51060;&#50612;&#49436; &#45824;&#54868;&#54616;&#49464;&#50836;.</p>
+            </div>
             <span class="account-name">{{ request.user.username }}</span>
             <form action="{% url 'accounts:logout' %}" method="post" data-confirm="&#47196;&#44536;&#50500;&#50883;&#54624;&#44620;&#50836;?">
                 {% csrf_token %}
@@ -83,7 +87,9 @@
                             {% endif %}
                         </article>
                     {% empty %}
-                        <div class="empty-state">&#47700;&#49884;&#51648;&#47484; &#51077;&#47141;&#54616;&#47732; &#45824;&#54868;&#44032; &#49884;&#51089;&#46121;&#45768;&#45796;.</div>
+                        <div class="empty-state">
+                            <h2>Where should we begin?</h2>
+                        </div>
                     {% endfor %}
                 </div>
             </section>
@@ -97,6 +103,7 @@
             </form>
         {% else %}
             <section class="first-chat">
+                <h2>Where should we begin?</h2>
                 <form class="composer first-chat-composer" action="{% url 'mine_chat:session_create' %}" method="post">
                     {% csrf_token %}
                     <div class="composer-inner">
@@ -104,6 +111,23 @@
                         <button class="send-button" type="submit" aria-label="&#51204;&#49569;">&#8593;</button>
                     </div>
                 </form>
+                <div class="example-questions" aria-label="&#50696;&#49884; &#51656;&#47928;">
+                    <form action="{% url 'mine_chat:session_create' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="content" value="&#45796;&#51060;&#50500; &#52880;&#45716;&#48277;">
+                        <button class="example-question-button" type="submit">&#45796;&#51060;&#50500; &#52880;&#45716;&#48277;</button>
+                    </form>
+                    <form action="{% url 'mine_chat:session_create' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="content" value="&#50644;&#45908;&#50900;&#46300; &#44032;&#45716;&#48277;">
+                        <button class="example-question-button" type="submit">&#50644;&#45908;&#50900;&#46300; &#44032;&#45716;&#48277;</button>
+                    </form>
+                    <form action="{% url 'mine_chat:session_create' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="content" value="&#51648;&#50725; &#44032;&#45716;&#48277;">
+                        <button class="example-question-button" type="submit">&#51648;&#50725; &#44032;&#45716;&#48277;</button>
+                    </form>
+                </div>
             </section>
         {% endif %}
     </main>
