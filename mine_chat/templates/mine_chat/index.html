@@ -7,50 +7,52 @@
             <h1 class="brand">MINE_TUNING</h1>
             <form action="{% url 'mine_chat:index' %}" method="get">
                 <input type="hidden" name="new" value="1">
-                <button class="new-chat" type="submit"><span class="nav-icon">+</span><span>&#49352; &#52292;&#54021;</span></button>
+                <button class="new-chat" type="submit"><span class="nav-icon">+</span><span>새 채팅</span></button>
             </form>
         </div>
 
         <section class="history-section">
-            <h2 class="history-title">&#52572;&#44540;</h2>
-            <nav class="history" aria-label="&#52292;&#54021; &#44592;&#47197;">
+            <h2 class="history-title">최근</h2>
+            <nav class="history" aria-label="채팅 기록">
                 {% for session in sessions %}
                     <div class="history-item{% if active_session.pk == session.pk %} active{% endif %}" data-history-item>
                         <a class="history-link" href="{% url 'mine_chat:session_detail' session.pk %}">
                             {{ session.title }}
                         </a>
-                        <button class="history-menu-button" type="button" aria-label="&#52292;&#54021; &#47700;&#45684;" data-history-menu-button>...</button>
+                        <button class="history-menu-button" type="button" aria-label="채팅 메뉴" data-history-menu-button>...</button>
                         <div class="history-menu" data-history-menu hidden>
                             <form class="history-rename-form" action="{% url 'mine_chat:session_update' session.pk %}" method="post">
                                 {% csrf_token %}
                                 <input class="history-rename-input" type="text" name="title" value="{{ session.title }}" required>
-                                <button class="history-menu-action" type="submit">&#51060;&#47492; &#49688;&#51221;</button>
+                                <button class="history-menu-action" type="submit">이름 수정</button>
                             </form>
-                            <form action="{% url 'mine_chat:session_delete' session.pk %}" method="post" data-confirm="&#51060; &#52292;&#54021;&#51012; &#49325;&#51228;&#54624;&#44620;&#50836;?">
+                            <form action="{% url 'mine_chat:session_delete' session.pk %}" method="post" data-confirm="이 채팅을 삭제할까요?">
                                 {% csrf_token %}
-                                <button class="history-menu-action danger" type="submit">&#49325;&#51228;</button>
+                                <button class="history-menu-action danger" type="submit">삭제</button>
                             </form>
                         </div>
                     </div>
                 {% empty %}
-                    <p class="empty-history">&#50500;&#51649; &#52292;&#54021; &#44592;&#47197;&#51060; &#50630;&#49845;&#45768;&#45796;.</p>
+                    <p class="empty-history">아직 채팅 기록이 없습니다.</p>
                 {% endfor %}
             </nav>
         </section>
 
+        <a class="community-link" href="/community/">커뮤니티로</a>
+
         <div class="account-panel">
             <div>
-                <strong>&#45208;&#50640;&#44172; &#47582;&#45716; &#45824;&#54868;</strong>
-                <p>&#51200;&#51109;&#46108; &#52292;&#54021;&#51012; &#44592;&#48152;&#51004;&#47196; &#51060;&#50612;&#49436; &#45824;&#54868;&#54616;&#49464;&#50836;.</p>
+                <strong>나에게 맞는 대화</strong>
+                <p>저장된 채팅을 기반으로 이어서 대화하세요.</p>
             </div>
             <span class="account-name">{{ request.user.username }}</span>
-            <form action="{% url 'accounts:logout' %}" method="post" data-confirm="&#47196;&#44536;&#50500;&#50883;&#54624;&#44620;&#50836;?">
+            <form action="{% url 'accounts:logout' %}" method="post" data-confirm="로그아웃할까요?">
                 {% csrf_token %}
-                <button class="small-button account-button" type="submit">&#47196;&#44536;&#50500;&#50883;</button>
+                <button class="small-button account-button" type="submit">로그아웃</button>
             </form>
-            <form action="{% url 'accounts:delete' %}" method="post" data-confirm="&#44228;&#51221;&#51012; &#49325;&#51228;&#54624;&#44620;&#50836;? &#44228;&#51221; &#45936;&#51060;&#53552;&#44032; &#47784;&#46160; &#49325;&#51228;&#46121;&#45768;&#45796;.">
+            <form action="{% url 'accounts:delete' %}" method="post" data-confirm="계정을 삭제할까요? 계정 데이터가 모두 삭제됩니다.">
                 {% csrf_token %}
-                <button class="danger-button account-button" type="submit">&#54924;&#50896;&#53448;&#53748;</button>
+                <button class="danger-button account-button" type="submit">회원탈퇴</button>
             </form>
         </div>
     </aside>
@@ -61,7 +63,7 @@
                 <span>{{ active_session.title }}</span>
             </div>
 
-            <section class="messages" aria-label="&#47700;&#49884;&#51648;" data-message-scroll>
+            <section class="messages" aria-label="메시지" data-message-scroll>
                 <div class="message-list">
                     {% for message in active_session.messages.all %}
                         <article class="message {{ message.role }}">
@@ -72,9 +74,9 @@
                                     <textarea class="message-edit-input" name="content" rows="2" required hidden>{{ message.content }}</textarea>
                                     <div class="message-meta">
                                         <div class="message-actions">
-                                            <button class="message-action-button" type="button" data-edit-message>&#49688;&#51221;</button>
-                                            <button class="message-edit-button" type="submit" hidden>&#51200;&#51109;</button>
-                                            <button class="message-cancel-button" type="button" data-cancel-edit hidden>&#52712;&#49548;</button>
+                                            <button class="message-action-button" type="button" data-edit-message>수정</button>
+                                            <button class="message-edit-button" type="submit" hidden>저장</button>
+                                            <button class="message-cancel-button" type="button" data-cancel-edit hidden>취소</button>
                                         </div>
                                     </div>
                                 </form>
@@ -94,7 +96,7 @@
                 {% csrf_token %}
                 <div class="composer-inner">
                     {{ message_form.content }}
-                    <button class="send-button" type="submit" aria-label="&#51204;&#49569;">&#8593;</button>
+                    <button class="send-button" type="submit" aria-label="전송">↑</button>
                 </div>
             </form>
         {% else %}
@@ -104,24 +106,24 @@
                     {% csrf_token %}
                     <div class="composer-inner">
                         {{ message_form.content }}
-                        <button class="send-button" type="submit" aria-label="&#51204;&#49569;">&#8593;</button>
+                        <button class="send-button" type="submit" aria-label="전송">↑</button>
                     </div>
                 </form>
-                <div class="example-questions" aria-label="&#50696;&#49884; &#51656;&#47928;">
+                <div class="example-questions" aria-label="예시 질문">
                     <form action="{% url 'mine_chat:session_create' %}" method="post">
                         {% csrf_token %}
-                        <input type="hidden" name="content" value="&#45796;&#51060;&#50500; &#52880;&#45716;&#48277;">
-                        <button class="example-question-button" type="submit">&#45796;&#51060;&#50500; &#52880;&#45716;&#48277;</button>
+                        <input type="hidden" name="content" value="다이아 캐는법">
+                        <button class="example-question-button" type="submit">다이아 캐는법</button>
                     </form>
                     <form action="{% url 'mine_chat:session_create' %}" method="post">
                         {% csrf_token %}
-                        <input type="hidden" name="content" value="&#50644;&#45908;&#50900;&#46300; &#44032;&#45716;&#48277;">
-                        <button class="example-question-button" type="submit">&#50644;&#45908;&#50900;&#46300; &#44032;&#45716;&#48277;</button>
+                        <input type="hidden" name="content" value="엔더월드 가는법">
+                        <button class="example-question-button" type="submit">엔더월드 가는법</button>
                     </form>
                     <form action="{% url 'mine_chat:session_create' %}" method="post">
                         {% csrf_token %}
-                        <input type="hidden" name="content" value="&#51648;&#50725; &#44032;&#45716;&#48277;">
-                        <button class="example-question-button" type="submit">&#51648;&#50725; &#44032;&#45716;&#48277;</button>
+                        <input type="hidden" name="content" value="지옥 가는법">
+                        <button class="example-question-button" type="submit">지옥 가는법</button>
                     </form>
                 </div>
             </section>

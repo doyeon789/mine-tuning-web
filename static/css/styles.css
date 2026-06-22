@@ -217,6 +217,25 @@ a {
     color: var(--color-carbon);
 }
 
+.community-link {
+    display: block;
+    margin: 16px 6px 0;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 999px;
+    background: var(--color-snow);
+    color: var(--color-carbon);
+    padding: 8px 16px;
+    font-size: 14px;
+    line-height: 1.43;
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.community-link:hover {
+    background: var(--color-arctic-mist);
+}
+
 .account-panel {
     display: grid;
     gap: 8px;
