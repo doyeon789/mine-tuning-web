@@ -60,6 +60,15 @@ class CommunityMarkdownViewTests(TestCase):
         self.assertContains(response, "https://example.com/image.png")
         self.assertNotContains(response, "cdn.jsdelivr.net")
         self.assertNotContains(response, "post.image")
+    def test_post_form_loads_markdown_image_editor(self):
+        response = self.client.get(reverse("community:post_create"))
+
+        self.assertContains(response, "data-markdown-editor")
+        self.assertContains(response, "js/community_markdown.js")
+        self.assertContains(
+            response,
+            reverse("community:markdown_image_upload"),
+        )
     def test_create_post_with_markdown_content(self):
         response = self.client.post(
             reverse("community:post_create"),
@@ -167,5 +176,6 @@ class MarkdownImageUploadTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 302)
+
 
 
