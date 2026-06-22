@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<main class="auth-page">
+    <a class="auth-brand" href="{% url 'accounts:login' %}">
+        <span>MINE_TUNING</span>
+    </a>
+
+    <section class="auth-layout">
+        <div class="auth-form-panel">
+            <h1>{{ account.get_provider.name }} 계정으로<br>가입할까요?</h1>
+            <p class="auth-subtitle">필요한 정보를 확인하면 바로 채팅을 시작할 수 있습니다.</p>
+
+            <form class="auth-form" method="post" action="{% url 'socialaccount_signup' %}">
+                {% csrf_token %}
+                {% if form.errors %}
+                    <div class="form-errors">{{ form.errors }}</div>
+                {% endif %}
+                {{ form.as_p }}
+                <button class="auth-primary" type="submit">가입하기</button>
+            </form>
+        </div>
+
+        <div class="auth-visual" aria-hidden="true">
+            <img class="auth-visual-image" src="{% static 'images/auth/logo.webp' %}" alt="">
+        </div>
+    </section>
+</main>
+{% endblock content %}
