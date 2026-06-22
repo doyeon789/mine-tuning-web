@@ -1,38 +1,56 @@
-﻿{% extends "base.html" %}
-
-{% block content %}
+﻿{% extends "base.html" %} {% block content %}
 <main class="community-page">
-    <header class="community-header">
-        <div>
-            <a class="community-back-link" href="{% url 'community:post_list' %}">← 목록으로</a>
-            <h1>{{ post.title }}</h1>
-            <p>
-                {{ post.author.username }}
-                ·
-                <time datetime="{{ post.created_at|date:'c' }}">{{ post.created_at|date:"Y.m.d H:i" }}</time>
-                {% if post.updated_at != post.created_at %}
-                    · 수정 {{ post.updated_at|date:"Y.m.d H:i" }}
-                {% endif %}
-            </p>
-        </div>
+  <header class="community-header">
+    <div>
+      <a class="community-back-link" href="{% url 'community:post_list' %}"
+        >← 목록으로</a
+      >
+      <h1>{{ post.title }}</h1>
+      <p>
+        {{ post.author.username }} ·
+        <time datetime="{{ post.created_at|date:'c' }}"
+          >{{ post.created_at|date:"Y.m.d H:i" }}</time
+        >
+        {% if post.updated_at != post.created_at %} · 수정 {{
+        post.updated_at|date:"Y.m.d H:i" }} {% endif %}
+      </p>
+    </div>
 
-        {% if post.author == request.user %}
-            <div class="community-actions">
-                <a class="community-secondary-link" href="{% url 'community:post_update' post.pk %}">수정</a>
-                <form action="{% url 'community:post_delete' post.pk %}" method="post" data-confirm="이 글을 삭제할까요?">
-                    {% csrf_token %}
-                    <button class="community-danger-button" type="submit">삭제</button>
-                </form>
-            </div>
-        {% endif %}
-    </header>
-
-    {% if post.image %}
-        <img class="community-detail-image" src="{{ post.image.url }}" alt="{{ post.title }} 첨부 이미지">
+    {% if post.author == request.user %}
+    <div class="community-actions">
+      <a
+        class="community-secondary-link"
+        href="{% url 'community:post_update' post.pk %}"
+        >수정</a
+      >
+      <form
+        action="{% url 'community:post_delete' post.pk %}"
+        method="post"
+        data-confirm="이 글을 삭제할까요?"
+      >
+        {% csrf_token %}
+        <button class="community-danger-button" type="submit">삭제</button>
+      </form>
+    </div>
     {% endif %}
+  </header>
 
-    <article class="community-detail-card">
-        {{ post.content|linebreaks }}
-    </article>
+  {% if post.image %}
+  <img
+    class="community-detail-image"
+    src="{{ post.image.url }}"
+    alt="{{ post.title }} 첨부 이미지"
+  />
+  {% endif %}
+
+  <article class="community-detail-card">
+    <div id="markdown-content"></div>
+  </article>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    const raw = `{{ post.content|escapejs }}`;
+    document.getElementById("markdown-content").innerHTML = marked.parse(raw);
+  </script>
 </main>
 {% endblock content %}
