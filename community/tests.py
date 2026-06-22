@@ -20,6 +20,15 @@ class MarkdownFilterTests(SimpleTestCase):
         self.assertIn('src="https://example.com/image.png"', rendered)
         self.assertIn('alt="설명"', rendered)
 
+    def test_renders_uploaded_media_image(self):
+        rendered = render_markdown(
+            "![로컬 이미지](/media/community/markdown/sample.png)"
+        )
+
+        self.assertIn(
+            'src="/media/community/markdown/sample.png"',
+            rendered,
+        )
     def test_removes_unsafe_html_and_protocols(self):
         content = '<script>alert("xss")</script>\n\n[위험](javascript:alert(1))'
 
@@ -158,4 +167,5 @@ class MarkdownImageUploadTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 302)
+
 
