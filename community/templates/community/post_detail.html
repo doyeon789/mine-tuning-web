@@ -7,14 +7,21 @@
         <div>
             <a class="community-back-link" href="{% url 'community:post_list' %}">← 목록으로</a>
             <h1>{{ post.title }}</h1>
-            <p>
-                {{ post.author.username }}
-                ·
-                <time datetime="{{ post.created_at|date:'c' }}">{{ post.created_at|date:"Y.m.d H:i" }}</time>
-                {% if post.updated_at != post.created_at %}
-                    · 수정 {{ post.updated_at|date:"Y.m.d H:i" }}
+            <div class="community-post-meta">
+                <span class="community-meta-author">{{ post.author.username }}</span>
+                <span class="community-meta-item">
+                    <span class="community-meta-label">작성</span>
+                    <time datetime="{{ post.created_at|date:'c' }}">{{ post.created_at|date:"Y년 n월 j일 H:i" }}</time>
+                </span>
+                {% if post.is_edited %}
+                    <span
+                        class="community-edited-badge"
+                        title="마지막 수정 {{ post.updated_at|date:'Y년 n월 j일 H:i:s' }}"
+                    >
+                        수정됨
+                    </span>
                 {% endif %}
-            </p>
+            </div>
         </div>
 
         {% if post.author == request.user %}
