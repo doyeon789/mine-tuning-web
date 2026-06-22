@@ -27,6 +27,10 @@
         {% endif %}
     </header>
 
+    {% if post.image %}
+        <img class="community-detail-image" src="{{ post.image.url }}" alt="{{ post.title }} 첨부 이미지">
+    {% endif %}
+
     <article class="community-detail-card">
         {{ post.content|linebreaks }}
     </article>
