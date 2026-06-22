@@ -1,4 +1,6 @@
-﻿from django.contrib.auth import get_user_model
+﻿from datetime import timedelta
+
+from django.contrib.auth import get_user_model
 from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 
@@ -60,4 +62,37 @@ class CommunityMarkdownViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "<h2>생성 성공</h2>", html=True)
         self.assertContains(response, "https://example.com/new.png")
+
+class PostMetadataTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username="metadata-writer",
+            password="test-password",
+        )
+        self.post = Post.objects.create(
+            author=self.user,
+            title="메타정보 글",
+            content="본문",
+        )
+        self.client.force_login(self.user)
+
+    def test_new_post_does_not_show_edited_badge(self):
+        response = self.client.get(
+            reverse("community:post_detail", kwargs={"pk": self.post.pk})
+        )
+
+        self.assertFalse(self.post.is_edited)
+        self.assertNotContains(response, "수정됨")
+
+    def test_updated_post_shows_edited_badge(self):
+        edited_at = self.post.created_at + timedelta(seconds=2)
+        Post.objects.filter(pk=self.post.pk).update(updated_at=edited_at)
+        self.post.refresh_from_db()
+
+        response = self.client.get(
+            reverse("community:post_detail", kwargs={"pk": self.post.pk})
+        )
+
+        self.assertTrue(self.post.is_edited)
+        self.assertContains(response, "수정됨")
 
