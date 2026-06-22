@@ -1,4 +1,5 @@
 ﻿from django.conf import settings
+from django.core.validators import FileExtensionValidator
 from django.db import models
 
 
@@ -10,6 +11,15 @@ class Post(models.Model):
     )
     title = models.CharField(max_length=120)
     content = models.TextField()
+    image = models.FileField(
+        upload_to="community/posts/",
+        blank=True,
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=["jpg", "jpeg", "png", "gif", "webp"]
+            )
+        ],
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
