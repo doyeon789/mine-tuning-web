@@ -22,7 +22,7 @@ def post_detail(request, pk):
 @login_required
 def post_create(request):
     if request.method == "POST":
-        form = PostForm(request.POST)
+        form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
@@ -45,7 +45,7 @@ def post_update(request, pk):
         raise PermissionDenied
 
     if request.method == "POST":
-        form = PostForm(request.POST, instance=post)
+        form = PostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             post = form.save()
             return redirect("community:post_detail", pk=post.pk)
@@ -68,3 +68,4 @@ def post_delete(request, pk):
 
     post.delete()
     return redirect("community:post_list")
+
