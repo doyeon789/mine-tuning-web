@@ -1,6 +1,6 @@
 ﻿from django import forms
 
-from .models import Post
+from .models import Comment, Post
 
 
 class PostForm(forms.ModelForm):
@@ -21,4 +21,22 @@ class PostForm(forms.ModelForm):
                     "rows": 16,
                 }
             ),
+        }
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ["content"]
+        widgets = {
+            "content": forms.Textarea(
+                attrs={
+                    "class": "community-comment-textarea",
+                    "placeholder": "댓글을 입력하세요",
+                    "rows": 3,
+                }
+            ),
+        }
+        labels = {
+            "content": "댓글",
         }
