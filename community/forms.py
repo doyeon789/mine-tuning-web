@@ -6,7 +6,7 @@ from .models import Post
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ["title", "content", "image"]
+        fields = ["title", "content"]
         widgets = {
             "title": forms.TextInput(
                 attrs={
@@ -17,14 +17,8 @@ class PostForm(forms.ModelForm):
             "content": forms.Textarea(
                 attrs={
                     "class": "community-textarea",
-                    "placeholder": "내용을 입력하세요",
-                    "rows": 12,
-                }
-            ),
-            "image": forms.ClearableFileInput(
-                attrs={
-                    "class": "community-file-input",
-                    "accept": "image/jpeg,image/png,image/gif,image/webp",
+                    "placeholder": "마크다운으로 내용을 작성하세요",
+                    "rows": 16,
                 }
             ),
         }
