@@ -47,3 +47,17 @@ class CommunityMarkdownViewTests(TestCase):
         self.assertContains(response, "https://example.com/image.png")
         self.assertNotContains(response, "cdn.jsdelivr.net")
         self.assertNotContains(response, "post.image")
+    def test_create_post_with_markdown_content(self):
+        response = self.client.post(
+            reverse("community:post_create"),
+            {
+                "title": "새 마크다운 글",
+                "content": "## 생성 성공\n\n![이미지](https://example.com/new.png)",
+            },
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "<h2>생성 성공</h2>", html=True)
+        self.assertContains(response, "https://example.com/new.png")
+
