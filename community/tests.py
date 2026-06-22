@@ -1,7 +1,9 @@
 ﻿from datetime import timedelta
+import tempfile
 
 from django.contrib.auth import get_user_model
-from django.test import SimpleTestCase, TestCase
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 
 from .models import Post
@@ -95,4 +97,65 @@ class PostMetadataTests(TestCase):
 
         self.assertTrue(self.post.is_edited)
         self.assertContains(response, "수정됨")
+
+class MarkdownImageUploadTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username="image-writer",
+            password="test-password",
+        )
+        self.client.force_login(self.user)
+        self.media_directory = tempfile.TemporaryDirectory()
+        self.settings_override = override_settings(
+            MEDIA_ROOT=self.media_directory.name
+        )
+        self.settings_override.enable()
+        self.addCleanup(self.settings_override.disable)
+        self.addCleanup(self.media_directory.cleanup)
+
+    def test_uploads_valid_image_and_returns_media_url(self):
+        image = SimpleUploadedFile(
+            "sample.png",
+            b"\x89PNG\r\n\x1a\n" + b"image-data",
+            content_type="image/png",
+        )
+
+        response = self.client.post(
+            reverse("community:markdown_image_upload"),
+            {"image": image},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["url"].startswith("/media/community/"))
+
+    def test_rejects_file_with_invalid_image_signature(self):
+        image = SimpleUploadedFile(
+            "fake.png",
+            b"<html>not an image</html>",
+            content_type="image/png",
+        )
+
+        response = self.client.post(
+            reverse("community:markdown_image_upload"),
+            {"image": image},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["error"], "올바른 이미지 파일이 아닙니다.")
+
+    def test_requires_login(self):
+        self.client.logout()
+
+        response = self.client.post(
+            reverse("community:markdown_image_upload"),
+            {
+                "image": SimpleUploadedFile(
+                    "sample.png",
+                    b"\x89PNG\r\n\x1a\n" + b"image-data",
+                    content_type="image/png",
+                )
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
 
