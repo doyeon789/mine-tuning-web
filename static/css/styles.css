@@ -443,6 +443,10 @@ a {
     min-width: 0;
 }
 
+.message.user .message-edit-form {
+    position: relative;
+}
+
 .message-edit-input {
     display: block;
     width: 100%;
@@ -478,6 +482,21 @@ a {
     margin-left: auto;
     justify-content: flex-end;
     white-space: nowrap;
+}
+
+.message.user:not(.editing) .message-meta {
+    position: absolute;
+    top: calc(100% - 2px);
+    right: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 120ms ease;
+}
+
+.message.user:not(.editing):hover .message-meta,
+.message.user:not(.editing):focus-within .message-meta {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .message-action-button,
