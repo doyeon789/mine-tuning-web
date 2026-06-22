@@ -21,6 +21,8 @@
                 <div class="community-meta">
                     <span>{{ post.author.username }}</span>
                     <time datetime="{{ post.created_at|date:'c' }}">{{ post.created_at|date:"Y.m.d H:i" }}</time>
+                    <span>조회 {{ post.view_count }}</span>
+                    <span>좋아요 {{ post.like_total }}</span>
                 </div>
             </article>
         {% empty %}

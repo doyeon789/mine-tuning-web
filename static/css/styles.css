@@ -945,6 +945,7 @@ a {
 .community-primary-link,
 .community-secondary-link,
 .community-submit-button,
+.community-like-button,
 .community-danger-button {
     display: inline-flex;
     align-items: center;
@@ -966,9 +967,16 @@ a {
 }
 
 .community-secondary-link,
+.community-like-button,
 .community-danger-button {
     background: #ffffff;
     color: #171717;
+}
+
+.community-like-button.is-active {
+    border-color: #171717;
+    background: #171717;
+    color: #ffffff;
 }
 
 .community-danger-button {
@@ -1008,6 +1016,7 @@ a {
 
 .community-meta {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     color: #8f8f8f;
     font-size: 14px;
@@ -1042,6 +1051,91 @@ a {
 
 .community-detail-card p:first-child {
     margin-top: 0;
+}
+
+.community-comments {
+    display: grid;
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.community-comments-header h2 {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.4;
+}
+
+.community-comment-form {
+    display: grid;
+    gap: 10px;
+    border: 1px solid #ececec;
+    border-radius: 18px;
+    background: #ffffff;
+    padding: 18px;
+}
+
+.community-comment-textarea {
+    width: 100%;
+    min-height: 96px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+    padding: 12px 14px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.community-comment-form .community-submit-button {
+    justify-self: end;
+}
+
+.community-comment-login {
+    border: 1px solid #ececec;
+    border-radius: 18px;
+    background: #ffffff;
+    padding: 18px;
+    color: #5d5d5d;
+}
+
+.community-comment-login a {
+    color: #171717;
+    font-weight: 700;
+}
+
+.community-comment-list {
+    display: grid;
+    gap: 10px;
+}
+
+.community-comment {
+    border: 1px solid #ececec;
+    border-radius: 18px;
+    background: #ffffff;
+    padding: 18px;
+}
+
+.community-comment-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    color: #8f8f8f;
+    font-size: 14px;
+}
+
+.community-comment-meta strong {
+    color: #171717;
+}
+
+.community-comment p,
+.community-comment-empty {
+    margin: 10px 0 0;
+    color: #171717;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.community-comment-empty {
+    color: #8f8f8f;
 }
 
 .community-form-page {
