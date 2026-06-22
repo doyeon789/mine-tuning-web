@@ -71,7 +71,6 @@
                                     <div class="message-content" data-message-text>{{ message.content }}</div>
                                     <textarea class="message-edit-input" name="content" rows="2" required hidden>{{ message.content }}</textarea>
                                     <div class="message-meta">
-                                        <span>{{ message.created_at|date:"Y-m-d H:i" }}</span>
                                         <div class="message-actions">
                                             <button class="message-action-button" type="button" data-edit-message>&#49688;&#51221;</button>
                                             <button class="message-edit-button" type="submit" hidden>&#51200;&#51109;</button>
@@ -81,9 +80,6 @@
                                 </form>
                             {% else %}
                                 <div class="message-content">{{ message.content }}</div>
-                                <div class="message-meta">
-                                    <span>{{ message.created_at|date:"Y-m-d H:i" }}</span>
-                                </div>
                             {% endif %}
                         </article>
                     {% empty %}

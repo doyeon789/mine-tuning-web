@@ -83,6 +83,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    const resizeMessageEditInput = (textarea) => {
+        textarea.style.height = "auto";
+        textarea.style.height = `${textarea.scrollHeight}px`;
+    };
+
     document.querySelectorAll("[data-edit-message]").forEach((button) => {
         button.addEventListener("click", () => {
             const form = button.closest("[data-message-form]");
@@ -91,10 +96,13 @@ document.addEventListener("DOMContentLoaded", () => {
             const textarea = form.querySelector("textarea");
             const saveButton = form.querySelector(".message-edit-button");
             const cancelButton = form.querySelector(".message-cancel-button");
+            const textWidth = text.getBoundingClientRect().width;
 
+            message.style.width = `${textWidth}px`;
             message.classList.add("editing");
             text.hidden = true;
             textarea.hidden = false;
+            resizeMessageEditInput(textarea);
             button.hidden = true;
             saveButton.hidden = false;
             cancelButton.hidden = false;
@@ -113,12 +121,18 @@ document.addEventListener("DOMContentLoaded", () => {
             const saveButton = form.querySelector(".message-edit-button");
 
             message.classList.remove("editing");
+            message.style.width = "";
             textarea.value = textarea.defaultValue;
+            textarea.style.height = "";
             textarea.hidden = true;
             text.hidden = false;
             saveButton.hidden = true;
             button.hidden = true;
             editButton.hidden = false;
         });
+    });
+
+    document.querySelectorAll(".message-edit-input").forEach((textarea) => {
+        textarea.addEventListener("input", () => resizeMessageEditInput(textarea));
     });
 });
