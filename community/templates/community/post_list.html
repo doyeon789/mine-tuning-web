@@ -1,0 +1,35 @@
+﻿{% extends "base.html" %}
+
+{% block content %}
+<main class="community-page">
+    <header class="community-header">
+        <div>
+            <a class="community-back-link" href="{% url 'mine_chat:index' %}">← 채팅으로</a>
+            <h1>커뮤니티</h1>
+            <p>전체 글을 확인하고 마인크래프트 튜닝 팁을 공유해보세요.</p>
+        </div>
+        <a class="community-primary-link" href="{% url 'community:post_create' %}">글 작성</a>
+    </header>
+
+    <section class="community-card-list" aria-label="전체 글">
+        {% for post in posts %}
+            <article class="community-card">
+                <a class="community-card-title" href="{% url 'community:post_detail' post.pk %}">
+                    {{ post.title }}
+                </a>
+                <p class="community-card-content">{{ post.content|truncatechars:120 }}</p>
+                <div class="community-meta">
+                    <span>{{ post.author.username }}</span>
+                    <time datetime="{{ post.created_at|date:'c' }}">{{ post.created_at|date:"Y.m.d H:i" }}</time>
+                </div>
+            </article>
+        {% empty %}
+            <div class="community-empty">
+                <h2>아직 작성된 글이 없습니다.</h2>
+                <p>첫 번째 커뮤니티 글을 남겨보세요.</p>
+                <a class="community-primary-link" href="{% url 'community:post_create' %}">글 작성</a>
+            </div>
+        {% endfor %}
+    </section>
+</main>
+{% endblock content %}
