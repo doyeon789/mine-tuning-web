@@ -486,9 +486,8 @@ a {
 
 .message.user:not(.editing) .message-meta {
     position: absolute;
-    top: 100%;
+    top: calc(100% - 2px);
     right: 0;
-    margin-top: 4px;
     opacity: 0;
     pointer-events: none;
     transition: opacity 120ms ease;
