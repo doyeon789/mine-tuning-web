@@ -1206,3 +1206,50 @@ a {
     font-weight: 700;
     cursor: help;
 }
+
+.community-markdown-editor {
+    position: relative;
+    display: grid;
+    gap: 8px;
+}
+
+.community-markdown-editor.dragging .community-textarea {
+    border-color: #171717;
+    background: #fafafa;
+    outline: 3px solid rgba(23, 23, 23, 0.1);
+}
+
+.community-image-drop-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    border: 1px dashed #c9c9c9;
+    border-radius: 10px;
+    color: #777777;
+    padding: 9px 12px;
+    font-size: 13px;
+    text-align: center;
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease,
+        color 0.15s ease;
+}
+
+.community-markdown-editor.dragging .community-image-drop-hint {
+    border-color: #171717;
+    background: #f0f0f0;
+    color: #171717;
+    font-weight: 700;
+}
+
+.community-image-upload-status {
+    min-height: 20px;
+    margin: 0;
+    color: #4f6b52;
+    font-size: 13px;
+}
+
+.community-image-upload-status.error {
+    color: #b42318;
+}
