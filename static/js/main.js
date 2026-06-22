@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+﻿document.addEventListener("DOMContentLoaded", () => {
     const messageScroll = document.querySelector("[data-message-scroll]");
     if (messageScroll) {
         messageScroll.scrollTop = messageScroll.scrollHeight;
@@ -136,3 +136,4 @@ document.addEventListener("DOMContentLoaded", () => {
         textarea.addEventListener("input", () => resizeMessageEditInput(textarea));
     });
 });
+

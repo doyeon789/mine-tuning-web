@@ -1,4 +1,6 @@
-﻿from django.conf import settings
+﻿from datetime import timedelta
+
+from django.conf import settings
 from django.db import models
 
 
@@ -21,6 +23,10 @@ class Post(models.Model):
 
     class Meta:
         ordering = ["-created_at", "-pk"]
+
+    @property
+    def is_edited(self):
+        return self.updated_at >= self.created_at + timedelta(seconds=1)
 
     def __str__(self):
         return self.title

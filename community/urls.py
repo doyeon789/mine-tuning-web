@@ -7,6 +7,11 @@ app_name = "community"
 urlpatterns = [
     path("", views.post_list, name="post_list"),
     path("new/", views.post_create, name="post_create"),
+    path(
+        "images/upload/",
+        views.markdown_image_upload,
+        name="markdown_image_upload",
+    ),
     path("<int:pk>/", views.post_detail, name="post_detail"),
     path("<int:pk>/like/", views.post_like, name="post_like"),
     path("<int:pk>/comments/", views.comment_create, name="comment_create"),

@@ -1,4 +1,5 @@
 ﻿{% extends "base.html" %}
+{% load community_markdown %}
 
 {% block content %}
 <main class="community-page">
@@ -17,7 +18,7 @@
                 <a class="community-card-title" href="{% url 'community:post_detail' post.pk %}">
                     {{ post.title }}
                 </a>
-                <p class="community-card-content">{{ post.content|truncatechars:120 }}</p>
+                <p class="community-card-content">{{ post.content|markdown|striptags|truncatechars:120 }}</p>
                 <div class="community-meta">
                     <span>{{ post.author.username }}</span>
                     <time datetime="{{ post.created_at|date:'c' }}">{{ post.created_at|date:"Y.m.d H:i" }}</time>

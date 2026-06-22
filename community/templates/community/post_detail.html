@@ -1,153 +1,153 @@
-﻿{% extends "base.html" %} {% block content %}
+﻿{% extends "base.html" %}
+{% load community_markdown %}
+
+{% block content %}
 <main class="community-page">
-  <header class="community-header">
-    <div>
-      <a class="community-back-link" href="{% url 'community:post_list' %}"
-        >← 목록으로</a
-      >
-      <h1>{{ post.title }}</h1>
-      <p>
-        {{ post.author.username }} ·
-        <time datetime="{{ post.created_at|date:'c' }}"
-          >{{ post.created_at|date:"Y.m.d H:i" }}</time
-        >
-        {% if post.updated_at != post.created_at %} · 수정 {{
-        post.updated_at|date:"Y.m.d H:i" }} {% endif %}
-        · 조회 {{ post.view_count }} · 좋아요
-        <span id="community-like-count">{{ post.like_count }}</span>
-      </p>
-    </div>
-
-    <div class="community-actions">
-      {% if request.user.is_authenticated %}
-      <form
-        id="community-like-form"
-        action="{% url 'community:post_like' post.pk %}"
-        method="post"
-      >
-        {% csrf_token %}
-        <button
-          id="community-like-button"
-          class="community-like-button{% if is_liked %} is-active{% endif %}"
-          type="submit"
-          data-liked-label="좋아요 취소"
-          data-unliked-label="좋아요"
-        >
-          {% if is_liked %}좋아요 취소{% else %}좋아요{% endif %}
-        </button>
-      </form>
-      {% else %}
-      <a class="community-secondary-link" href="{% url 'accounts:login' %}?next={{ request.path }}">좋아요</a>
-      {% endif %}
-
-      {% if post.author == request.user %}
-      <a
-        class="community-secondary-link"
-        href="{% url 'community:post_update' post.pk %}"
-        >수정</a
-      >
-      <form
-        action="{% url 'community:post_delete' post.pk %}"
-        method="post"
-        data-confirm="이 글을 삭제할까요?"
-      >
-        {% csrf_token %}
-        <button class="community-danger-button" type="submit">삭제</button>
-      </form>
-      {% endif %}
-    </div>
-  </header>
-
-  {% if post.image %}
-  <img
-    class="community-detail-image"
-    src="{{ post.image.url }}"
-    alt="{{ post.title }} 첨부 이미지"
-  />
-  {% endif %}
-
-  <article class="community-detail-card">
-    <div id="markdown-content"></div>
-  </article>
-
-  <section class="community-comments" aria-label="댓글">
-    <div class="community-comments-header">
-      <h2>댓글 {{ post.comments.count }}</h2>
-    </div>
-
-    {% if request.user.is_authenticated %}
-    <form
-      class="community-comment-form"
-      action="{% url 'community:comment_create' post.pk %}"
-      method="post"
-    >
-      {% csrf_token %}
-      {{ comment_form.content }}
-      <button class="community-submit-button" type="submit">댓글 등록</button>
-    </form>
-    {% else %}
-    <div class="community-comment-login">
-      <a href="{% url 'accounts:login' %}?next={{ request.path }}">로그인</a> 후 댓글을 남길 수 있습니다.
-    </div>
-    {% endif %}
-
-    <div class="community-comment-list">
-      {% for comment in post.comments.all %}
-      <article class="community-comment">
-        <div class="community-comment-meta">
-          <strong>{{ comment.author.username }}</strong>
-          <time datetime="{{ comment.created_at|date:'c' }}">
-            {{ comment.created_at|date:"Y.m.d H:i" }}
-          </time>
+    <header class="community-header">
+        <div>
+            <a class="community-back-link" href="{% url 'community:post_list' %}">← 목록으로</a>
+            <h1>{{ post.title }}</h1>
+            <div class="community-post-meta">
+                <span class="community-meta-author">{{ post.author.username }}</span>
+                <span class="community-meta-item">
+                    <span class="community-meta-label">작성</span>
+                    <time datetime="{{ post.created_at|date:'c' }}">{{ post.created_at|date:"Y년 n월 j일 H:i" }}</time>
+                </span>
+                {% if post.is_edited %}
+                    <span
+                        class="community-edited-badge"
+                        title="마지막 수정 {{ post.updated_at|date:'Y년 n월 j일 H:i:s' }}"
+                    >
+                        수정됨
+                    </span>
+                {% endif %}
+                <span class="community-meta-item">
+                    <span class="community-meta-label">조회</span>
+                    {{ post.view_count }}
+                </span>
+                <span class="community-meta-item">
+                    <span class="community-meta-label">좋아요</span>
+                    <span id="community-like-count">{{ post.like_count }}</span>
+                </span>
+            </div>
         </div>
-        <p>{{ comment.content|linebreaksbr }}</p>
-      </article>
-      {% empty %}
-      <p class="community-comment-empty">아직 댓글이 없습니다.</p>
-      {% endfor %}
-    </div>
-  </section>
 
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script>
-    const raw = `{{ post.content|escapejs }}`;
-    document.getElementById("markdown-content").innerHTML = marked.parse(raw);
+        <div class="community-actions">
+            {% if request.user.is_authenticated %}
+                <form
+                    id="community-like-form"
+                    action="{% url 'community:post_like' post.pk %}"
+                    method="post"
+                >
+                    {% csrf_token %}
+                    <button
+                        id="community-like-button"
+                        class="community-like-button{% if is_liked %} is-active{% endif %}"
+                        type="submit"
+                        data-liked-label="좋아요 취소"
+                        data-unliked-label="좋아요"
+                    >
+                        {% if is_liked %}좋아요 취소{% else %}좋아요{% endif %}
+                    </button>
+                </form>
+            {% else %}
+                <a class="community-secondary-link" href="{% url 'accounts:login' %}?next={{ request.path }}">좋아요</a>
+            {% endif %}
 
-    const likeForm = document.getElementById("community-like-form");
-    if (likeForm) {
-      likeForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
+            {% if post.author == request.user %}
+                <a class="community-secondary-link" href="{% url 'community:post_update' post.pk %}">수정</a>
+                <form
+                    action="{% url 'community:post_delete' post.pk %}"
+                    method="post"
+                    data-confirm="이 글을 삭제할까요?"
+                >
+                    {% csrf_token %}
+                    <button class="community-danger-button" type="submit">삭제</button>
+                </form>
+            {% endif %}
+        </div>
+    </header>
 
-        const button = document.getElementById("community-like-button");
-        const count = document.getElementById("community-like-count");
-        const csrfToken = likeForm.querySelector("[name=csrfmiddlewaretoken]").value;
+    <article class="community-detail-card community-markdown">
+        {{ post.content|markdown }}
+    </article>
 
-        button.disabled = true;
-        try {
-          const response = await fetch(likeForm.action, {
-            method: "POST",
-            headers: {
-              "X-CSRFToken": csrfToken,
-              "X-Requested-With": "XMLHttpRequest",
-            },
-          });
+    <section class="community-comments" aria-label="댓글">
+        <div class="community-comments-header">
+            <h2>댓글 {{ post.comments.count }}</h2>
+        </div>
 
-          if (!response.ok) {
-            likeForm.submit();
-            return;
-          }
+        {% if request.user.is_authenticated %}
+            <form
+                class="community-comment-form"
+                action="{% url 'community:comment_create' post.pk %}"
+                method="post"
+            >
+                {% csrf_token %}
+                {{ comment_form.content }}
+                <button class="community-submit-button" type="submit">댓글 등록</button>
+            </form>
+        {% else %}
+            <div class="community-comment-login">
+                <a href="{% url 'accounts:login' %}?next={{ request.path }}">로그인</a> 후 댓글을 남길 수 있습니다.
+            </div>
+        {% endif %}
 
-          const data = await response.json();
-          button.classList.toggle("is-active", data.is_liked);
-          button.textContent = data.is_liked
-            ? button.dataset.likedLabel
-            : button.dataset.unlikedLabel;
-          count.textContent = data.like_count;
-        } finally {
-          button.disabled = false;
+        <div class="community-comment-list">
+            {% for comment in post.comments.all %}
+                <article class="community-comment">
+                    <div class="community-comment-meta">
+                        <strong>{{ comment.author.username }}</strong>
+                        <time datetime="{{ comment.created_at|date:'c' }}">
+                            {{ comment.created_at|date:"Y.m.d H:i" }}
+                        </time>
+                    </div>
+                    <p>{{ comment.content|linebreaksbr }}</p>
+                </article>
+            {% empty %}
+                <p class="community-comment-empty">아직 댓글이 없습니다.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <script>
+        const likeForm = document.getElementById("community-like-form");
+        if (likeForm) {
+            likeForm.addEventListener("submit", async (event) => {
+                event.preventDefault();
+
+                const button = document.getElementById("community-like-button");
+                const count = document.getElementById("community-like-count");
+                const csrfToken = likeForm.querySelector(
+                    "[name=csrfmiddlewaretoken]"
+                ).value;
+
+                button.disabled = true;
+                try {
+                    const response = await fetch(likeForm.action, {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": csrfToken,
+                            "X-Requested-With": "XMLHttpRequest",
+                        },
+                    });
+
+                    if (!response.ok) {
+                        likeForm.submit();
+                        return;
+                    }
+
+                    const data = await response.json();
+                    button.classList.toggle("is-active", data.is_liked);
+                    button.textContent = data.is_liked
+                        ? button.dataset.likedLabel
+                        : button.dataset.unlikedLabel;
+                    count.textContent = data.like_count;
+                } finally {
+                    button.disabled = false;
+                }
+            });
         }
-      });
-    }
-  </script>
+    </script>
 </main>
 {% endblock content %}
