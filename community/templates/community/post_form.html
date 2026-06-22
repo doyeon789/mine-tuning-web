@@ -6,11 +6,11 @@
         <div>
             <a class="community-back-link" href="{% if post %}{% url 'community:post_detail' post.pk %}{% else %}{% url 'community:post_list' %}{% endif %}">← 돌아가기</a>
             <h1>{{ page_title }}</h1>
-            <p>제목과 내용을 입력한 뒤 저장하세요.</p>
+            <p>제목, 이미지, 내용을 입력한 뒤 저장하세요. 내용에는 마크다운을 사용할 수 있습니다.</p>
         </div>
     </header>
 
-    <form class="community-form" method="post">
+    <form class="community-form" method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
@@ -21,9 +21,18 @@
         {{ form.title }}
         {{ form.title.errors }}
 
+        <label for="{{ form.image.id_for_label }}">이미지</label>
+        {% if post.image %}
+            <img class="community-form-image-preview" src="{{ post.image.url }}" alt="현재 첨부 이미지">
+        {% endif %}
+        {{ form.image }}
+        {{ form.image.errors }}
+        <p class="community-help-text">JPG, PNG, GIF, WEBP 이미지를 첨부할 수 있습니다.</p>
+
         <label for="{{ form.content.id_for_label }}">내용</label>
         {{ form.content }}
         {{ form.content.errors }}
+        <p class="community-help-text">마크다운 예시: 제목, 강조, 인라인 코드, 코드 블록을 사용할 수 있습니다.</p>
 
         <div class="community-form-actions">
             <a class="community-secondary-link" href="{% url 'community:post_list' %}">취소</a>
