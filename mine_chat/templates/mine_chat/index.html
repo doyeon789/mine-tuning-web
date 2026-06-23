@@ -9,17 +9,18 @@
                 <input type="hidden" name="new" value="1">
                 <button class="new-chat" type="submit"><span class="nav-icon">+</span><span>새 채팅</span></button>
             </form>
+            <a class="community-link" href="/community/">커뮤니티로</a>
         </div>
 
         <section class="history-section">
-            <h2 class="history-title">최근</h2>
+            <h2 class="history-title">채팅</h2>
             <nav class="history" aria-label="채팅 기록">
                 {% for session in sessions %}
                     <div class="history-item{% if active_session.pk == session.pk %} active{% endif %}" data-history-item>
                         <a class="history-link" href="{% url 'mine_chat:session_detail' session.pk %}">
                             {{ session.title }}
                         </a>
-                        <button class="history-menu-button" type="button" aria-label="채팅 메뉴" data-history-menu-button>...</button>
+                        <button class="history-menu-button" type="button" aria-label="채팅 메뉴" data-history-menu-button>•••</button>
                         <div class="history-menu" data-history-menu hidden>
                             <form class="history-rename-form" action="{% url 'mine_chat:session_update' session.pk %}" method="post">
                                 {% csrf_token %}
@@ -38,22 +39,31 @@
             </nav>
         </section>
 
-        <a class="community-link" href="/community/">커뮤니티로</a>
-
         <div class="account-panel">
-            <div>
-                <strong>나에게 맞는 대화</strong>
-                <p>저장된 채팅을 기반으로 이어서 대화하세요.</p>
+            <div class="account-menu-wrap" data-account-menu-wrap>
+                <span class="account-name">{{ request.user.username }}</span>
+                <button
+                    class="account-menu-button"
+                    type="button"
+                    aria-label="계정 메뉴"
+                    aria-expanded="false"
+                    data-account-menu-button
+                >
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <div class="account-menu" data-account-menu hidden>
+                    <form action="{% url 'accounts:logout' %}" method="post" data-confirm="로그아웃할까요?">
+                        {% csrf_token %}
+                        <button class="account-menu-action" type="submit">로그아웃</button>
+                    </form>
+                    <form action="{% url 'accounts:delete' %}" method="post" data-confirm="계정을 삭제할까요? 계정 데이터가 모두 삭제됩니다.">
+                        {% csrf_token %}
+                        <button class="account-menu-action danger" type="submit">회원탈퇴</button>
+                    </form>
+                </div>
             </div>
-            <span class="account-name">{{ request.user.username }}</span>
-            <form action="{% url 'accounts:logout' %}" method="post" data-confirm="로그아웃할까요?">
-                {% csrf_token %}
-                <button class="small-button account-button" type="submit">로그아웃</button>
-            </form>
-            <form action="{% url 'accounts:delete' %}" method="post" data-confirm="계정을 삭제할까요? 계정 데이터가 모두 삭제됩니다.">
-                {% csrf_token %}
-                <button class="danger-button account-button" type="submit">회원탈퇴</button>
-            </form>
         </div>
     </aside>
 

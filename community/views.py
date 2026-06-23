@@ -41,6 +41,7 @@ POPULAR_PERIODS = {
     },
 }
 DEFAULT_POPULAR_PERIOD = "realtime"
+POPULAR_PREVIEW_LIMIT = 5
 
 
 def _matches_image_signature(content_type, header):
@@ -88,7 +89,7 @@ def post_list(request):
         "community/post_list.html",
         {
             "posts": posts,
-            "popular_posts": _popular_posts(popular_period)[:5],
+            "popular_posts": _popular_posts(popular_period)[:POPULAR_PREVIEW_LIMIT],
             "popular_periods": POPULAR_PERIODS,
             "popular_period": popular_period,
         },
@@ -122,6 +123,10 @@ def post_detail(request, pk):
         request.user.is_authenticated
         and post.liked_users.filter(pk=request.user.pk).exists()
     )
+    can_like_post = (
+        request.user.is_authenticated
+        and post.author_id != request.user.pk
+    )
     comment_form = CommentForm()
     return render(
         request,
@@ -129,6 +134,7 @@ def post_detail(request, pk):
         {
             "post": post,
             "is_liked": is_liked,
+            "can_like_post": can_like_post,
             "comment_form": comment_form,
         },
     )
@@ -178,6 +184,17 @@ def post_update(request, pk):
 @login_required
 def post_like(request, pk):
     post = get_object_or_404(Post, pk=pk)
+    if post.author_id == request.user.pk:
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse(
+                {
+                    "error": "본인 게시글에는 좋아요를 누를 수 없습니다.",
+                    "like_count": post.liked_users.count(),
+                },
+                status=403,
+            )
+        raise PermissionDenied
+
     if post.liked_users.filter(pk=request.user.pk).exists():
         post.liked_users.remove(request.user)
         is_liked = False
