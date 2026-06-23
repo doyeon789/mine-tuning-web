@@ -96,11 +96,31 @@
         <div class="community-comment-list">
             {% for comment in post.comments.all %}
                 <article class="community-comment">
-                    <div class="community-comment-meta">
-                        <strong>{{ comment.author.username }}</strong>
-                        <time datetime="{{ comment.created_at|date:'c' }}">
-                            {{ comment.created_at|date:"Y.m.d H:i" }}
-                        </time>
+                    <div class="community-comment-header">
+                        <div class="community-comment-meta">
+                            <strong>{{ comment.author.username }}</strong>
+                            <time datetime="{{ comment.created_at|date:'c' }}">
+                                {{ comment.created_at|date:"Y.m.d H:i" }}
+                            </time>
+                        </div>
+                        {% if comment.author == request.user %}
+                            <div class="community-comment-menu">
+                                <button
+                                    class="community-comment-menu-button"
+                                    type="button"
+                                    aria-label="댓글 메뉴"
+                                    aria-expanded="false"
+                                >
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </button>
+                                <div class="community-comment-menu-panel" hidden>
+                                    <button type="button">수정</button>
+                                    <button type="button">삭제</button>
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
                     <p>{{ comment.content|linebreaksbr }}</p>
                 </article>
@@ -148,6 +168,57 @@
                 }
             });
         }
+
+        document.querySelectorAll(".community-comment-menu").forEach((menu) => {
+            const button = menu.querySelector(".community-comment-menu-button");
+            const panel = menu.querySelector(".community-comment-menu-panel");
+
+            button.addEventListener("click", (event) => {
+                event.stopPropagation();
+                const isOpen = !panel.hidden;
+
+                document
+                    .querySelectorAll(".community-comment-menu-panel")
+                    .forEach((openPanel) => {
+                        openPanel.hidden = true;
+                        openPanel
+                            .closest(".community-comment-menu")
+                            .querySelector(".community-comment-menu-button")
+                            .setAttribute("aria-expanded", "false");
+                    });
+
+                panel.hidden = isOpen;
+                button.setAttribute("aria-expanded", String(!isOpen));
+            });
+        });
+
+        document.addEventListener("click", () => {
+            document
+                .querySelectorAll(".community-comment-menu-panel")
+                .forEach((panel) => {
+                    panel.hidden = true;
+                    panel
+                        .closest(".community-comment-menu")
+                        .querySelector(".community-comment-menu-button")
+                        .setAttribute("aria-expanded", "false");
+                });
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key !== "Escape") {
+                return;
+            }
+
+            document
+                .querySelectorAll(".community-comment-menu-panel")
+                .forEach((panel) => {
+                    panel.hidden = true;
+                    panel
+                        .closest(".community-comment-menu")
+                        .querySelector(".community-comment-menu-button")
+                        .setAttribute("aria-expanded", "false");
+                });
+        });
     </script>
 </main>
 {% endblock content %}

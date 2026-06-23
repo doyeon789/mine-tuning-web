@@ -1113,6 +1113,13 @@ a {
     padding: 18px;
 }
 
+.community-comment-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
 .community-comment-meta {
     display: flex;
     flex-wrap: wrap;
@@ -1124,6 +1131,67 @@ a {
 
 .community-comment-meta strong {
     color: #171717;
+}
+
+.community-comment-menu {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+.community-comment-menu-button {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.community-comment-menu-button:hover,
+.community-comment-menu-button[aria-expanded="true"] {
+    border-color: #ececec;
+    background: #f7f7f7;
+}
+
+.community-comment-menu-button span {
+    display: block;
+    width: 4px;
+    height: 4px;
+    border-radius: 999px;
+    background: #5d5d5d;
+}
+
+.community-comment-menu-panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 2;
+    display: grid;
+    min-width: 92px;
+    overflow: hidden;
+    border: 1px solid #ececec;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+}
+
+.community-comment-menu-panel[hidden] {
+    display: none;
+}
+
+.community-comment-menu-panel button {
+    border: 0;
+    background: transparent;
+    padding: 10px 14px;
+    color: #171717;
+    text-align: left;
+    cursor: pointer;
+}
+
+.community-comment-menu-panel button:hover {
+    background: #f7f7f7;
 }
 
 .community-comment p,
