@@ -116,13 +116,44 @@
                                     <span></span>
                                 </button>
                                 <div class="community-comment-menu-panel" hidden>
-                                    <button type="button">수정</button>
+                                    <button
+                                        class="community-comment-edit-button"
+                                        type="button"
+                                    >
+                                        수정
+                                    </button>
                                     <button type="button">삭제</button>
                                 </div>
                             </div>
                         {% endif %}
                     </div>
-                    <p>{{ comment.content|linebreaksbr }}</p>
+                    <p class="community-comment-content">{{ comment.content|linebreaksbr }}</p>
+                    {% if comment.author == request.user %}
+                        <form
+                            class="community-comment-edit-form"
+                            action="{% url 'community:comment_update' post.pk comment.pk %}"
+                            method="post"
+                            hidden
+                        >
+                            {% csrf_token %}
+                            <textarea
+                                class="community-comment-textarea"
+                                name="content"
+                                rows="3"
+                                maxlength="1000"
+                                required
+                            >{{ comment.content }}</textarea>
+                            <div class="community-comment-edit-actions">
+                                <button class="community-submit-button" type="submit">저장</button>
+                                <button
+                                    class="community-secondary-button community-comment-edit-cancel"
+                                    type="button"
+                                >
+                                    취소
+                                </button>
+                            </div>
+                        </form>
+                    {% endif %}
                 </article>
             {% empty %}
                 <p class="community-comment-empty">아직 댓글이 없습니다.</p>
@@ -191,6 +222,44 @@
                 button.setAttribute("aria-expanded", String(!isOpen));
             });
         });
+
+        document
+            .querySelectorAll(".community-comment-edit-button")
+            .forEach((button) => {
+                button.addEventListener("click", () => {
+                    const comment = button.closest(".community-comment");
+                    const content = comment.querySelector(
+                        ".community-comment-content"
+                    );
+                    const form = comment.querySelector(
+                        ".community-comment-edit-form"
+                    );
+                    const textarea = form.querySelector("textarea");
+
+                    content.hidden = true;
+                    form.hidden = false;
+                    textarea.focus();
+                    textarea.setSelectionRange(
+                        textarea.value.length,
+                        textarea.value.length
+                    );
+                });
+            });
+
+        document
+            .querySelectorAll(".community-comment-edit-cancel")
+            .forEach((button) => {
+                button.addEventListener("click", () => {
+                    const comment = button.closest(".community-comment");
+
+                    comment.querySelector(
+                        ".community-comment-content"
+                    ).hidden = false;
+                    comment.querySelector(
+                        ".community-comment-edit-form"
+                    ).hidden = true;
+                });
+            });
 
         document.addEventListener("click", () => {
             document

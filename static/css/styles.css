@@ -944,6 +944,7 @@ a {
 
 .community-primary-link,
 .community-secondary-link,
+.community-secondary-button,
 .community-submit-button,
 .community-like-button,
 .community-danger-button {
@@ -955,8 +956,10 @@ a {
     border-radius: 999px;
     padding: 8px 18px;
     font-size: 14px;
+    font-family: inherit;
     text-decoration: none;
     white-space: nowrap;
+    cursor: pointer;
 }
 
 .community-primary-link,
@@ -967,6 +970,7 @@ a {
 }
 
 .community-secondary-link,
+.community-secondary-button,
 .community-like-button,
 .community-danger-button {
     background: #ffffff;
@@ -1200,6 +1204,22 @@ a {
     color: #171717;
     line-height: 1.6;
     overflow-wrap: anywhere;
+}
+
+.community-comment-edit-form {
+    display: grid;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.community-comment-edit-form[hidden] {
+    display: none;
+}
+
+.community-comment-edit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
 }
 
 .community-comment-empty {

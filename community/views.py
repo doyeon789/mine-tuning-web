@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from .forms import CommentForm, PostForm
-from .models import Post
+from .models import Comment, Post
 
 MAX_IMAGE_SIZE = 5 * 1024 * 1024
 IMAGE_EXTENSIONS = {
@@ -136,6 +136,19 @@ def comment_create(request, pk):
         comment.author = request.user
         comment.save()
     return redirect("community:post_detail", pk=post.pk)
+
+
+@require_POST
+@login_required
+def comment_update(request, pk, comment_pk):
+    comment = get_object_or_404(Comment, pk=comment_pk, post_id=pk)
+    if comment.author != request.user:
+        raise PermissionDenied
+
+    form = CommentForm(request.POST, instance=comment)
+    if form.is_valid():
+        form.save()
+    return redirect("community:post_detail", pk=pk)
 
 
 @require_POST
