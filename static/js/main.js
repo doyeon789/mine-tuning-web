@@ -15,6 +15,20 @@
     const closeHistoryMenus = () => {
         document.querySelectorAll("[data-history-menu]").forEach((menu) => {
             menu.hidden = true;
+            const renameForm = menu.querySelector("[data-history-rename-form]");
+            const renameButton = menu.querySelector("[data-history-rename-button]");
+
+            if (renameForm) {
+                renameForm.hidden = true;
+                const input = renameForm.querySelector("input");
+                if (input) {
+                    input.value = input.defaultValue;
+                }
+            }
+
+            if (renameButton) {
+                renameButton.hidden = false;
+            }
         });
     };
     
@@ -27,11 +41,34 @@
 
             closeHistoryMenus();
             menu.hidden = !shouldOpen;
-            if (shouldOpen) {
-                const input = menu.querySelector("input");
-                input.focus();
-                input.select();
-            }
+        });
+    });
+
+    document.querySelectorAll("[data-history-rename-button]").forEach((button) => {
+        button.addEventListener("click", (event) => {
+            event.stopPropagation();
+            const menu = button.closest("[data-history-menu]");
+            const form = menu.querySelector("[data-history-rename-form]");
+            const input = form.querySelector("input");
+
+            button.hidden = true;
+            form.hidden = false;
+            input.focus();
+            input.select();
+        });
+    });
+
+    document.querySelectorAll("[data-history-rename-cancel]").forEach((button) => {
+        button.addEventListener("click", (event) => {
+            event.stopPropagation();
+            const form = button.closest("[data-history-rename-form]");
+            const menu = form.closest("[data-history-menu]");
+            const renameButton = menu.querySelector("[data-history-rename-button]");
+            const input = form.querySelector("input");
+
+            input.value = input.defaultValue;
+            form.hidden = true;
+            renameButton.hidden = false;
         });
     });
 
@@ -165,4 +202,3 @@
         textarea.addEventListener("input", () => resizeMessageEditInput(textarea));
     });
 });
-
