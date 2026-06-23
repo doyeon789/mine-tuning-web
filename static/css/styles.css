@@ -134,11 +134,6 @@ a {
     margin-bottom: 12px;
 }
 
-.pinned-title {
-    color: var(--color-carbon);
-    font-weight: 600;
-}
-
 .chat-history-title {
     margin-top: 16px;
 }
