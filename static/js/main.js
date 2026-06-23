@@ -127,9 +127,7 @@
             const textarea = form.querySelector("textarea");
             const saveButton = form.querySelector(".message-edit-button");
             const cancelButton = form.querySelector(".message-cancel-button");
-            const textWidth = text.getBoundingClientRect().width;
 
-            message.style.width = `${textWidth}px`;
             message.classList.add("editing");
             text.hidden = true;
             textarea.hidden = false;
