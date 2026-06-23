@@ -10,6 +10,56 @@
         <a class="community-primary-link" href="{% url 'community:post_create' %}">글 작성</a>
     </header>
 
+    <section class="community-popular-preview" aria-label="인기 게시글">
+        <div class="community-popular-preview-header">
+            <a
+                class="community-popular-preview-title"
+                href="{% url 'community:popular_post_list' %}?period={{ popular_period }}"
+            >
+                인기 게시글
+            </a>
+            <a
+                class="community-popular-preview-more"
+                href="{% url 'community:popular_post_list' %}?period={{ popular_period }}"
+                aria-label="인기 게시글 더보기"
+            >
+                &gt;
+            </a>
+        </div>
+
+        <nav class="community-popular-preview-tabs" aria-label="인기 게시글 기간">
+            {% for period_key, period in popular_periods.items %}
+                <a
+                    class="{% if popular_period == period_key %}is-active{% endif %}"
+                    href="{% url 'community:post_list' %}?popular_period={{ period_key }}"
+                >
+                    {{ period.label }}
+                </a>
+            {% endfor %}
+        </nav>
+
+        <div class="community-popular-preview-list">
+            {% for post in popular_posts %}
+                <a
+                    class="community-popular-preview-item"
+                    href="{% url 'community:post_detail' post.pk %}"
+                >
+                    <span class="community-popular-preview-rank">{{ forloop.counter }}</span>
+                    <span class="community-popular-preview-body">
+                        <strong>{{ post.title }}</strong>
+                        <span>
+                            조회 {{ post.view_count }} · 좋아요 {{ post.like_total }}
+                        </span>
+                    </span>
+                </a>
+            {% empty %}
+                <p class="community-popular-preview-empty">
+                    선택한 기간에 작성된 게시글이 없습니다.
+                </p>
+            {% endfor %}
+        </div>
+    </section>
+
     {% include "community/_post_card_list.html" with posts=posts list_label="전체 글" empty_title="아직 작성된 글이 없습니다." empty_message="첫 번째 커뮤니티 글을 남겨보세요." show_create_link=True %}
 </main>
 {% endblock content %}

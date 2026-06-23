@@ -231,6 +231,23 @@ class PopularPostListViewTests(TestCase):
         self.assertContains(response, "실시간 인기글")
         self.assertNotContains(response, "오래된 인기글")
 
+    def test_community_page_shows_popular_preview_links(self):
+        Post.objects.create(
+            author=self.user,
+            title="메인 인기글",
+            content="본문",
+            view_count=10,
+        )
+
+        response = self.client.get(
+            reverse("community:post_list") + "?popular_period=weekly"
+        )
+
+        self.assertContains(response, "인기 게시글")
+        self.assertContains(response, reverse("community:popular_post_list"))
+        self.assertContains(response, "메인 인기글")
+        self.assertContains(response, "popular_period=weekly")
+
 
 class MarkdownImageUploadTests(TestCase):
     def setUp(self):

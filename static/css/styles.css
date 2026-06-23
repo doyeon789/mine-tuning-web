@@ -992,6 +992,149 @@ a {
     gap: 14px;
 }
 
+.community-popular-preview {
+    display: grid;
+    gap: 14px;
+    margin-bottom: 28px;
+    border-top: 1px solid #ececec;
+    border-bottom: 1px solid #ececec;
+    padding: 20px 0;
+}
+
+.community-popular-preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.community-popular-preview-title {
+    color: #171717;
+    font-size: 22px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.community-popular-preview-title:hover {
+    text-decoration: underline;
+}
+
+.community-popular-preview-more {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid #ececec;
+    border-radius: 999px;
+    color: #171717;
+    font-size: 20px;
+    line-height: 1;
+    text-decoration: none;
+}
+
+.community-popular-preview-more:hover {
+    border-color: #171717;
+}
+
+.community-popular-preview-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border: 1px solid #ececec;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.community-popular-preview-tabs a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    border-right: 1px solid #ececec;
+    background: #ffffff;
+    color: #5d5d5d;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+}
+
+.community-popular-preview-tabs a:last-child {
+    border-right: 0;
+}
+
+.community-popular-preview-tabs a:hover,
+.community-popular-preview-tabs a.is-active {
+    background: #171717;
+    color: #ffffff;
+}
+
+.community-popular-preview-list {
+    display: grid;
+    gap: 2px;
+}
+
+.community-popular-preview-item {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+    border-radius: 8px;
+    padding: 10px 8px;
+    color: #171717;
+    text-decoration: none;
+}
+
+.community-popular-preview-item:hover {
+    background: #f7f7f7;
+}
+
+.community-popular-preview-rank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: #171717;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.community-popular-preview-body {
+    display: grid;
+    min-width: 0;
+    gap: 3px;
+}
+
+.community-popular-preview-body strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.community-popular-preview-body span,
+.community-popular-preview-empty {
+    color: #8f8f8f;
+    font-size: 14px;
+}
+
+.community-popular-preview-empty {
+    margin: 0;
+    padding: 16px 8px 4px;
+}
+
+@media (max-width: 640px) {
+    .community-popular-preview-tabs {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .community-popular-preview-tabs a:nth-child(2n) {
+        border-right: 0;
+    }
+}
+
 .community-popular-period-tabs {
     display: flex;
     flex-wrap: wrap;
