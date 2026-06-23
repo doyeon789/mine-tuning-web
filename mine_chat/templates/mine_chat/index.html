@@ -41,6 +41,7 @@
 
         <div class="account-panel">
             <div class="account-menu-wrap" data-account-menu-wrap>
+                <span class="account-name">{{ request.user.username }}</span>
                 <button
                     class="account-menu-button"
                     type="button"
@@ -52,7 +53,6 @@
                     <span></span>
                     <span></span>
                 </button>
-                <span class="account-name">{{ request.user.username }}</span>
                 <div class="account-menu" data-account-menu hidden>
                     <form action="{% url 'accounts:logout' %}" method="post" data-confirm="로그아웃할까요?">
                         {% csrf_token %}

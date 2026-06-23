@@ -250,10 +250,14 @@ a {
 }
 
 .account-name {
+    min-width: 0;
     color: var(--color-carbon);
     font-size: 14px;
     font-weight: 500;
     line-height: 1.43;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .account-menu-wrap {
