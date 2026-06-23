@@ -33,7 +33,7 @@
         </div>
 
         <div class="community-actions">
-            {% if request.user.is_authenticated %}
+            {% if can_like_post %}
                 <form
                     id="community-like-form"
                     action="{% url 'community:post_like' post.pk %}"
@@ -50,6 +50,8 @@
                         {% if is_liked %}좋아요 취소{% else %}좋아요{% endif %}
                     </button>
                 </form>
+            {% elif request.user.is_authenticated %}
+                <button class="community-like-button" type="button" disabled>좋아요</button>
             {% else %}
                 <a class="community-secondary-link" href="{% url 'accounts:login' %}?next={{ request.path }}">좋아요</a>
             {% endif %}

@@ -119,6 +119,56 @@ class PostMetadataTests(TestCase):
         self.assertContains(response, "수정됨")
 
 
+class PostLikeTests(TestCase):
+    def setUp(self):
+        self.author = get_user_model().objects.create_user(
+            username="like-author",
+            password="test-password",
+        )
+        self.reader = get_user_model().objects.create_user(
+            username="like-reader",
+            password="test-password",
+        )
+        self.post = Post.objects.create(
+            author=self.author,
+            title="좋아요 테스트 글",
+            content="본문",
+        )
+
+    def test_author_cannot_like_own_post(self):
+        self.client.force_login(self.author)
+
+        response = self.client.post(
+            reverse("community:post_like", kwargs={"pk": self.post.pk})
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(self.post.liked_users.count(), 0)
+
+    def test_author_sees_disabled_like_button(self):
+        self.client.force_login(self.author)
+
+        response = self.client.get(
+            reverse("community:post_detail", kwargs={"pk": self.post.pk})
+        )
+
+        self.assertContains(response, 'class="community-like-button"')
+        self.assertContains(response, "disabled")
+        self.assertNotContains(response, 'id="community-like-form"')
+
+    def test_other_user_can_like_post(self):
+        self.client.force_login(self.reader)
+
+        response = self.client.post(
+            reverse("community:post_like", kwargs={"pk": self.post.pk}),
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(self.post.liked_users.filter(pk=self.reader.pk).exists())
+        self.assertEqual(response.json()["like_count"], 1)
+
+
 class PopularPostQueryTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(
