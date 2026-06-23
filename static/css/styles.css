@@ -236,6 +236,10 @@ a {
     background: var(--color-arctic-mist);
 }
 
+.sidebar-top .community-link {
+    margin: 0;
+}
+
 .account-panel {
     display: grid;
     gap: 8px;
