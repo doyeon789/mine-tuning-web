@@ -12,7 +12,7 @@
         </div>
 
         <section class="history-section">
-            <h2 class="history-title">최근</h2>
+            <h2 class="history-title">채팅</h2>
             <nav class="history" aria-label="채팅 기록">
                 {% for session in sessions %}
                     <div class="history-item{% if active_session.pk == session.pk %} active{% endif %}" data-history-item>
