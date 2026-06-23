@@ -5,9 +5,11 @@ from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
 from .models import Post
 from .templatetags.community_markdown import render_markdown
+from .views import _popular_posts
 
 
 class MarkdownFilterTests(SimpleTestCase):
@@ -115,6 +117,83 @@ class PostMetadataTests(TestCase):
 
         self.assertTrue(self.post.is_edited)
         self.assertContains(response, "수정됨")
+
+
+class PopularPostQueryTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username="popular-writer",
+            password="test-password",
+        )
+        self.liker1 = get_user_model().objects.create_user(username="liker1")
+        self.liker2 = get_user_model().objects.create_user(username="liker2")
+
+    def create_post(self, title, view_count, created_at, liked_users=None):
+        post = Post.objects.create(
+            author=self.user,
+            title=title,
+            content="본문",
+            view_count=view_count,
+        )
+        if liked_users:
+            post.liked_users.add(*liked_users)
+        Post.objects.filter(pk=post.pk).update(created_at=created_at)
+        return post
+
+    def test_orders_by_score_likes_and_newer_created_at(self):
+        now = timezone.now()
+        older_same_score = self.create_post(
+            "동점 오래된 글",
+            8,
+            now - timedelta(hours=3),
+            [self.liker1],
+        )
+        higher_likes = self.create_post(
+            "동점 좋아요 많은 글",
+            7,
+            now - timedelta(hours=4),
+            [self.liker1, self.liker2],
+        )
+        newer_same_likes = self.create_post(
+            "동점 최신 글",
+            8,
+            now - timedelta(hours=1),
+            [self.liker1],
+        )
+        highest_score = self.create_post(
+            "점수 높은 글",
+            20,
+            now - timedelta(hours=2),
+        )
+
+        posts = list(_popular_posts("realtime"))
+
+        self.assertEqual(
+            posts,
+            [
+                highest_score,
+                higher_likes,
+                newer_same_likes,
+                older_same_score,
+            ],
+        )
+
+    def test_filters_by_selected_period(self):
+        now = timezone.now()
+        recent_post = self.create_post(
+            "최근 글",
+            1,
+            now - timedelta(hours=2),
+        )
+        self.create_post(
+            "하루 지난 글",
+            100,
+            now - timedelta(days=2),
+        )
+
+        self.assertEqual(list(_popular_posts("realtime")), [recent_post])
+        self.assertEqual(len(list(_popular_posts("weekly"))), 2)
+
 
 class MarkdownImageUploadTests(TestCase):
     def setUp(self):

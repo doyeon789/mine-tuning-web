@@ -1,11 +1,15 @@
 ﻿from uuid import uuid4
 
+from datetime import timedelta
+
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
-from django.db.models import Count, F
+from django.db.models import Count, F, IntegerField
+from django.db.models.expressions import ExpressionWrapper
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .forms import CommentForm, PostForm
@@ -18,6 +22,25 @@ IMAGE_EXTENSIONS = {
     "image/gif": "gif",
     "image/webp": "webp",
 }
+POPULAR_PERIODS = {
+    "realtime": {
+        "label": "실시간",
+        "duration": timedelta(hours=24),
+    },
+    "weekly": {
+        "label": "주간 인기글",
+        "duration": timedelta(days=7),
+    },
+    "monthly": {
+        "label": "월간 인기글",
+        "duration": timedelta(days=30),
+    },
+    "yearly": {
+        "label": "연간 인기글",
+        "duration": timedelta(days=365),
+    },
+}
+DEFAULT_POPULAR_PERIOD = "realtime"
 
 
 def _matches_image_signature(content_type, header):
@@ -30,12 +53,46 @@ def _matches_image_signature(content_type, header):
     return signatures.get(content_type, False)
 
 
+def _get_popular_period(period):
+    if period in POPULAR_PERIODS:
+        return period
+    return DEFAULT_POPULAR_PERIOD
+
+
+def _popular_posts(period):
+    period = _get_popular_period(period)
+    starts_at = timezone.now() - POPULAR_PERIODS[period]["duration"]
+    like_total = Count("liked_users", distinct=True)
+    popularity_score = ExpressionWrapper(
+        F("view_count") + F("like_total"),
+        output_field=IntegerField(),
+    )
+
+    return (
+        Post.objects.select_related("author")
+        .filter(created_at__gte=starts_at)
+        .annotate(like_total=like_total)
+        .annotate(popularity_score=popularity_score)
+        .order_by("-popularity_score", "-like_total", "-created_at", "-pk")
+    )
+
+
 def post_list(request):
+    popular_period = _get_popular_period(request.GET.get("popular_period"))
     posts = (
         Post.objects.select_related("author")
         .annotate(like_total=Count("liked_users"))
     )
-    return render(request, "community/post_list.html", {"posts": posts})
+    return render(
+        request,
+        "community/post_list.html",
+        {
+            "posts": posts,
+            "popular_posts": _popular_posts(popular_period)[:5],
+            "popular_periods": POPULAR_PERIODS,
+            "popular_period": popular_period,
+        },
+    )
 
 
 def post_detail(request, pk):
