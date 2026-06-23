@@ -992,6 +992,35 @@ a {
     gap: 14px;
 }
 
+.community-popular-period-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: -8px 0 18px;
+}
+
+.community-popular-period-tabs a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    border: 1px solid #ececec;
+    border-radius: 999px;
+    background: #ffffff;
+    padding: 7px 16px;
+    color: #5d5d5d;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.community-popular-period-tabs a:hover,
+.community-popular-period-tabs a.is-active {
+    border-color: #171717;
+    background: #171717;
+    color: #ffffff;
+}
+
 .community-card,
 .community-detail-card,
 .community-form,

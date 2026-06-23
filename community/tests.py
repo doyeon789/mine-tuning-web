@@ -195,6 +195,43 @@ class PopularPostQueryTests(TestCase):
         self.assertEqual(len(list(_popular_posts("weekly"))), 2)
 
 
+class PopularPostListViewTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username="popular-list-writer",
+            password="test-password",
+        )
+
+    def test_popular_page_uses_selected_period(self):
+        now = timezone.now()
+        recent_post = Post.objects.create(
+            author=self.user,
+            title="실시간 인기글",
+            content="본문",
+            view_count=10,
+        )
+        old_post = Post.objects.create(
+            author=self.user,
+            title="오래된 인기글",
+            content="본문",
+            view_count=100,
+        )
+        Post.objects.filter(pk=recent_post.pk).update(
+            created_at=now - timedelta(hours=1)
+        )
+        Post.objects.filter(pk=old_post.pk).update(
+            created_at=now - timedelta(days=2)
+        )
+
+        response = self.client.get(
+            reverse("community:popular_post_list") + "?period=realtime"
+        )
+
+        self.assertContains(response, "인기 게시글")
+        self.assertContains(response, "실시간 인기글")
+        self.assertNotContains(response, "오래된 인기글")
+
+
 class MarkdownImageUploadTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(

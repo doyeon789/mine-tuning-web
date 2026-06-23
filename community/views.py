@@ -95,6 +95,19 @@ def post_list(request):
     )
 
 
+def popular_post_list(request):
+    popular_period = _get_popular_period(request.GET.get("period"))
+    return render(
+        request,
+        "community/popular_post_list.html",
+        {
+            "posts": _popular_posts(popular_period),
+            "popular_periods": POPULAR_PERIODS,
+            "popular_period": popular_period,
+        },
+    )
+
+
 def post_detail(request, pk):
     post = get_object_or_404(
         Post.objects.select_related("author").prefetch_related(

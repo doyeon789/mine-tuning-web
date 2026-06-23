@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main class="community-page">
+    <header class="community-header">
+        <div>
+            <a class="community-back-link" href="{% url 'community:post_list' %}">← 커뮤니티로</a>
+            <h1>인기 게시글</h1>
+            <p>기간별 인기순으로 정렬된 게시글을 확인해보세요.</p>
+        </div>
+        <a class="community-primary-link" href="{% url 'community:post_create' %}">글 작성</a>
+    </header>
+
+    <nav class="community-popular-period-tabs" aria-label="인기 게시글 기간">
+        {% for period_key, period in popular_periods.items %}
+            <a
+                class="{% if popular_period == period_key %}is-active{% endif %}"
+                href="{% url 'community:popular_post_list' %}?period={{ period_key }}"
+            >
+                {{ period.label }}
+            </a>
+        {% endfor %}
+    </nav>
+
+    {% include "community/_post_card_list.html" with posts=posts list_label="인기 게시글" empty_title="인기 게시글이 없습니다." empty_message="선택한 기간에 작성된 게시글이 없습니다." show_create_link=False %}
+</main>
+{% endblock content %}

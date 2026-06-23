@@ -1,6 +1,4 @@
 ﻿{% extends "base.html" %}
-{% load community_markdown %}
-
 {% block content %}
 <main class="community-page">
     <header class="community-header">
@@ -12,27 +10,6 @@
         <a class="community-primary-link" href="{% url 'community:post_create' %}">글 작성</a>
     </header>
 
-    <section class="community-card-list" aria-label="전체 글">
-        {% for post in posts %}
-            <article class="community-card">
-                <a class="community-card-title" href="{% url 'community:post_detail' post.pk %}">
-                    {{ post.title }}
-                </a>
-                <p class="community-card-content">{{ post.content|markdown|striptags|truncatechars:120 }}</p>
-                <div class="community-meta">
-                    <span>{{ post.author.username }}</span>
-                    <time datetime="{{ post.created_at|date:'c' }}">{{ post.created_at|date:"Y.m.d H:i" }}</time>
-                    <span>조회 {{ post.view_count }}</span>
-                    <span>좋아요 {{ post.like_total }}</span>
-                </div>
-            </article>
-        {% empty %}
-            <div class="community-empty">
-                <h2>아직 작성된 글이 없습니다.</h2>
-                <p>첫 번째 커뮤니티 글을 남겨보세요.</p>
-                <a class="community-primary-link" href="{% url 'community:post_create' %}">글 작성</a>
-            </div>
-        {% endfor %}
-    </section>
+    {% include "community/_post_card_list.html" with posts=posts list_label="전체 글" empty_title="아직 작성된 글이 없습니다." empty_message="첫 번째 커뮤니티 글을 남겨보세요." show_create_link=True %}
 </main>
 {% endblock content %}
