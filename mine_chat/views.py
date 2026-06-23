@@ -4,13 +4,13 @@ from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
+import requests
+import os
 
 from .forms import ChatMessageForm, ChatSessionForm
 from .models import ChatMessage, ChatSession
 
-ASSISTANT_PLACEHOLDER = (
-    "The LLM API is not connected yet. Replace this with a model response later."
-)
+NGROK_URL = os.environ.get("NGROK_URL", "https://eligibly-shove-cartload.ngrok-free.dev")
 SESSION_TITLE_MAX_LENGTH = 32
 
 
@@ -37,11 +37,33 @@ def _chat_context(user, active_session=None, message_form=None, session_form=Non
     }
 
 
+def _call_rag_api(question: str) -> str:
+    try:
+        resp = requests.post(
+            f"{NGROK_URL}/chat",
+            json={"question": question},
+            headers={"ngrok-skip-browser-warning": "true"},
+            timeout=60,
+        )
+        return resp.json().get("answer", "답변을 가져오지 못했습니다.")
+    except Exception as e:
+        return f"API 연결 오류: {str(e)}"
+    
+
 def _create_assistant_response(session):
+    last_user_message = session.messages.filter(
+        role=ChatMessage.Role.USER
+    ).last()
+
+    if last_user_message:
+        answer = _call_rag_api(last_user_message.content)
+    else:
+        answer = "질문을 찾을 수 없습니다."
+
     return ChatMessage.objects.create(
         session=session,
         role=ChatMessage.Role.ASSISTANT,
-        content=ASSISTANT_PLACEHOLDER,
+        content=answer,
     )
 
 
