@@ -984,12 +984,6 @@ a {
 }
 
 .community-detail-page {
-    width: min(560px, calc(100% - 32px));
-    margin-top: 2px;
-    border: 1px solid var(--community-neutral-100);
-    border-radius: 8px;
-    background: #ffffff;
-    padding: 28px 32px 48px;
     color: var(--community-neutral-700);
 }
 
@@ -1007,17 +1001,9 @@ a {
     line-height: 1.25;
 }
 
-.community-detail-page .community-header {
-    display: block;
-    margin-bottom: 18px;
-}
-
 .community-detail-page .community-header h1 {
-    margin: 22px 0 10px;
     color: var(--community-neutral-900);
-    font-size: 32px;
     font-weight: 800;
-    line-height: 1.2;
 }
 
 .community-header p {
