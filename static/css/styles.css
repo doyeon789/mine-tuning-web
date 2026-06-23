@@ -1185,7 +1185,12 @@ a {
     display: none;
 }
 
+.community-comment-menu-panel form {
+    margin: 0;
+}
+
 .community-comment-menu-panel button {
+    width: 100%;
     border: 0;
     background: transparent;
     padding: 10px 14px;

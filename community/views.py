@@ -153,6 +153,17 @@ def comment_update(request, pk, comment_pk):
 
 @require_POST
 @login_required
+def comment_delete(request, pk, comment_pk):
+    comment = get_object_or_404(Comment, pk=comment_pk, post_id=pk)
+    if comment.author != request.user:
+        raise PermissionDenied
+
+    comment.delete()
+    return redirect("community:post_detail", pk=pk)
+
+
+@require_POST
+@login_required
 def post_delete(request, pk):
     post = get_object_or_404(Post, pk=pk)
     if post.author != request.user:
