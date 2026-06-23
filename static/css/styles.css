@@ -1045,6 +1045,11 @@ a {
     color: #ffffff;
 }
 
+.community-like-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
 .community-danger-button {
     color: #b42318;
 }
@@ -1300,13 +1305,22 @@ a {
 }
 
 .community-detail-card {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 20px;
     min-height: 260px;
     color: #171717;
     font-size: 17px;
     line-height: 1.75;
 }
 
-.community-detail-card p:first-child {
+.community-detail-like-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 8px;
+}
+
+.community-detail-card .community-markdown p:first-child {
     margin-top: 0;
 }
 

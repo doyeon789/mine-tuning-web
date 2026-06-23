@@ -32,7 +32,26 @@
             </div>
         </div>
 
-        <div class="community-actions">
+        {% if post.author == request.user %}
+            <div class="community-actions">
+                <a class="community-secondary-link" href="{% url 'community:post_update' post.pk %}">수정</a>
+                <form
+                    action="{% url 'community:post_delete' post.pk %}"
+                    method="post"
+                    data-confirm="이 글을 삭제할까요?"
+                >
+                    {% csrf_token %}
+                    <button class="community-danger-button" type="submit">삭제</button>
+                </form>
+            </div>
+        {% endif %}
+    </header>
+
+    <article class="community-detail-card">
+        <div class="community-markdown">
+            {{ post.content|markdown }}
+        </div>
+        <div class="community-detail-like-actions">
             {% if can_like_post %}
                 <form
                     id="community-like-form"
@@ -55,23 +74,7 @@
             {% else %}
                 <a class="community-secondary-link" href="{% url 'accounts:login' %}?next={{ request.path }}">좋아요</a>
             {% endif %}
-
-            {% if post.author == request.user %}
-                <a class="community-secondary-link" href="{% url 'community:post_update' post.pk %}">수정</a>
-                <form
-                    action="{% url 'community:post_delete' post.pk %}"
-                    method="post"
-                    data-confirm="이 글을 삭제할까요?"
-                >
-                    {% csrf_token %}
-                    <button class="community-danger-button" type="submit">삭제</button>
-                </form>
-            {% endif %}
         </div>
-    </header>
-
-    <article class="community-detail-card community-markdown">
-        {{ post.content|markdown }}
     </article>
 
     <section class="community-comments" aria-label="댓글">
