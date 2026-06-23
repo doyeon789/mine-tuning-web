@@ -10,8 +10,19 @@
             <div class="community-meta">
                 <span>{{ post.author.username }}</span>
                 <time datetime="{{ post.created_at|date:'c' }}">{{ post.created_at|date:"Y.m.d H:i" }}</time>
-                <span>조회 {{ post.view_count }}</span>
-                <span>좋아요 {{ post.like_total }}</span>
+                <span>
+                    <svg class="community-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path>
+                        <circle cx="12" cy="12" r="2.5"></circle>
+                    </svg>
+                    {{ post.view_count }}
+                </span>
+                <span class="community-like-meta">
+                    <svg class="community-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M20.8 8.6c0 5.1-8.8 10.2-8.8 10.2S3.2 13.7 3.2 8.6A4.6 4.6 0 0 1 12 6.7a4.6 4.6 0 0 1 8.8 1.9z"></path>
+                    </svg>
+                    {{ post.like_total }}
+                </span>
             </div>
         </article>
     {% empty %}

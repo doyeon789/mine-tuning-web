@@ -3,11 +3,19 @@
 <main class="community-page">
     <header class="community-header">
         <div>
-            <a class="community-back-link" href="{% url 'mine_chat:index' %}">← 채팅으로</a>
+            <a class="community-back-link" href="{% url 'mine_chat:index' %}">
+                <svg class="community-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M15 6l-6 6 6 6"></path>
+                </svg>
+                채팅으로
+            </a>
             <h1>커뮤니티</h1>
             <p>전체 글을 확인하고 마인트리프트 꿀팁을 공유해보세요.</p>
         </div>
-        <a class="community-primary-link" href="{% url 'community:post_create' %}">글 작성</a>
+        <a class="community-primary-link" href="{% url 'community:post_create' %}">
+            <span aria-hidden="true">+</span>
+            글 작성
+        </a>
     </header>
 
     <section class="community-popular-preview" aria-label="인기 게시글">
@@ -23,7 +31,9 @@
                 href="{% url 'community:popular_post_list' %}?period={{ popular_period }}"
                 aria-label="인기 게시글 더보기"
             >
-                &gt;
+                <svg class="community-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M9 6l6 6-6 6"></path>
+                </svg>
             </a>
         </div>
 
@@ -51,8 +61,19 @@
                     <span class="community-popular-preview-meta">
                         <span>{{ post.author.username }}</span>
                         <time datetime="{{ post.created_at|date:'c' }}">{{ post.created_at|date:"Y.m.d H:i" }}</time>
-                        <span>조회 {{ post.view_count }}</span>
-                        <span>좋아요 {{ post.like_total }}</span>
+                        <span>
+                            <svg class="community-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path>
+                                <circle cx="12" cy="12" r="2.5"></circle>
+                            </svg>
+                            {{ post.view_count }}
+                        </span>
+                        <span class="community-like-meta">
+                            <svg class="community-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M20.8 8.6c0 5.1-8.8 10.2-8.8 10.2S3.2 13.7 3.2 8.6A4.6 4.6 0 0 1 12 6.7a4.6 4.6 0 0 1 8.8 1.9z"></path>
+                            </svg>
+                            {{ post.like_total }}
+                        </span>
                     </span>
                 </a>
             {% empty %}
