@@ -24,7 +24,7 @@ def _user_sessions(user):
                 output_field=DateTimeField(),
             )
         )
-        .order_by("-last_activity_at", "-created_at")
+        .order_by("-is_pinned", "-last_activity_at", "-created_at")
     )
 
 
@@ -140,6 +140,15 @@ def session_delete(request, pk):
     session = get_object_or_404(ChatSession, pk=pk, owner=request.user)
     session.delete()
     return redirect("mine_chat:index")
+
+
+@require_POST
+@login_required
+def session_pin(request, pk):
+    session = get_object_or_404(ChatSession, pk=pk, owner=request.user)
+    session.is_pinned = not session.is_pinned
+    session.save(update_fields=["is_pinned"])
+    return redirect("mine_chat:session_detail", pk=session.pk)
 
 
 @require_POST
