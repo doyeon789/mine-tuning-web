@@ -47,9 +47,12 @@
                     <span class="community-popular-preview-rank">{{ forloop.counter }}</span>
                     <span class="community-popular-preview-body">
                         <strong>{{ post.title }}</strong>
-                        <span>
-                            조회 {{ post.view_count }} · 좋아요 {{ post.like_total }}
-                        </span>
+                    </span>
+                    <span class="community-popular-preview-meta">
+                        <span>{{ post.author.username }}</span>
+                        <time datetime="{{ post.created_at|date:'c' }}">{{ post.created_at|date:"Y.m.d H:i" }}</time>
+                        <span>조회 {{ post.view_count }}</span>
+                        <span>좋아요 {{ post.like_total }}</span>
                     </span>
                 </a>
             {% empty %}
