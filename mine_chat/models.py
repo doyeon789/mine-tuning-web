@@ -11,6 +11,7 @@ class ChatSession(models.Model):
         blank=True,
     )
     title = models.CharField(max_length=120, default="새 채팅")
+    is_pinned = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
