@@ -965,10 +965,32 @@ a {
 }
 
 .community-page {
+    --community-blue-600: #185fa5;
+    --community-blue-50: #eef6ff;
+    --community-pink-600: #993556;
+    --community-pink-50: #fff0f5;
+    --community-neutral-900: #1a1a1a;
+    --community-neutral-700: #333230;
+    --community-neutral-400: #888780;
+    --community-neutral-300: #999990;
+    --community-neutral-200: #c4c2ba;
+    --community-neutral-100: #e5e4e0;
+    --community-neutral-50: #fafaf8;
+
     width: min(1040px, calc(100% - 40px));
     margin: 0 auto;
     padding: 48px 0 72px;
     color: #171717;
+}
+
+.community-detail-page {
+    width: min(560px, calc(100% - 32px));
+    margin-top: 2px;
+    border: 1px solid var(--community-neutral-100);
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 28px 32px 48px;
+    color: var(--community-neutral-700);
 }
 
 .community-header {
@@ -985,6 +1007,19 @@ a {
     line-height: 1.25;
 }
 
+.community-detail-page .community-header {
+    display: block;
+    margin-bottom: 18px;
+}
+
+.community-detail-page .community-header h1 {
+    margin: 22px 0 10px;
+    color: var(--community-neutral-900);
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
 .community-header p {
     margin: 0;
     color: #5d5d5d;
@@ -997,7 +1032,15 @@ a {
 }
 
 .community-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     color: #5d5d5d;
+    font-size: 14px;
+}
+
+.community-detail-page .community-back-link {
+    color: var(--community-neutral-400);
     font-size: 14px;
 }
 
@@ -1026,10 +1069,35 @@ a {
     cursor: pointer;
 }
 
+.community-icon {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
 .community-primary-link,
 .community-submit-button {
-    border-color: #171717;
-    background: #171717;
+    border-color: var(--community-blue-600);
+    background: var(--community-blue-50);
+    color: var(--community-blue-600);
+}
+
+.community-submit-button {
+    background: var(--community-blue-600);
     color: #ffffff;
 }
 
@@ -1041,10 +1109,20 @@ a {
     color: #171717;
 }
 
+.community-like-button {
+    gap: 6px;
+    border-color: var(--community-neutral-100);
+    color: var(--community-neutral-400);
+}
+
 .community-like-button.is-active {
-    border-color: #171717;
-    background: #171717;
-    color: #ffffff;
+    border-color: var(--community-pink-50);
+    background: var(--community-pink-50);
+    color: var(--community-pink-600);
+}
+
+.community-like-button.is-active .community-icon {
+    fill: currentColor;
 }
 
 .community-like-button:disabled {
@@ -1308,15 +1386,18 @@ a {
 
 .community-detail-card {
     min-height: 260px;
-    color: #171717;
-    font-size: 17px;
-    line-height: 1.75;
+    border-color: var(--community-neutral-100);
+    border-radius: 8px;
+    background: var(--community-neutral-50);
+    color: var(--community-neutral-700);
+    font-size: 15px;
+    line-height: 1.7;
 }
 
 .community-detail-like-actions {
     display: flex;
     justify-content: flex-end;
-    margin-top: 12px;
+    margin-top: 16px;
 }
 
 .community-detail-card .community-markdown p:first-child {
@@ -1326,7 +1407,7 @@ a {
 .community-comments {
     display: grid;
     gap: 14px;
-    margin-top: 20px;
+    margin-top: 28px;
 }
 
 .community-comments-header h2 {
@@ -1338,24 +1419,28 @@ a {
 .community-comment-form {
     display: grid;
     gap: 10px;
-    border: 1px solid #ececec;
-    border-radius: 18px;
-    background: #ffffff;
-    padding: 18px;
+    border: 0;
+    background: transparent;
+    padding: 0;
 }
 
 .community-comment-textarea {
     width: 100%;
-    min-height: 96px;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    border-radius: 12px;
+    min-height: 68px;
+    border: 1px solid var(--community-neutral-100);
+    border-radius: 8px;
     padding: 12px 14px;
     resize: vertical;
     line-height: 1.6;
 }
 
+.community-comment-textarea::placeholder {
+    color: var(--community-neutral-300);
+}
+
 .community-comment-form .community-submit-button {
     justify-self: end;
+    margin: 4px 0 0;
 }
 
 .community-comment-login {
@@ -1373,12 +1458,16 @@ a {
 
 .community-comment-list {
     display: grid;
-    gap: 10px;
+    gap: 12px;
+}
+
+.community-detail-page .community-comment-list {
+    min-height: 84px;
 }
 
 .community-comment {
-    border: 1px solid #ececec;
-    border-radius: 18px;
+    border: 1px solid var(--community-neutral-100);
+    border-radius: 8px;
     background: #ffffff;
     padding: 18px;
 }
@@ -1395,12 +1484,12 @@ a {
     flex-wrap: wrap;
     gap: 8px;
     align-items: center;
-    color: #8f8f8f;
+    color: var(--community-neutral-300);
     font-size: 14px;
 }
 
 .community-comment-meta strong {
-    color: #171717;
+    color: var(--community-blue-600);
 }
 
 .community-comment-menu {
@@ -1472,7 +1561,7 @@ a {
 .community-comment p,
 .community-comment-empty {
     margin: 10px 0 0;
-    color: #171717;
+    color: var(--community-neutral-700);
     line-height: 1.6;
     overflow-wrap: anywhere;
 }
@@ -1494,7 +1583,22 @@ a {
 }
 
 .community-comment-empty {
-    color: #8f8f8f;
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    margin: 24px 0 0;
+    color: var(--community-neutral-300);
+    text-align: center;
+}
+
+.community-empty-icon {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: var(--community-neutral-200);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 .community-form-page {
@@ -1645,12 +1749,12 @@ a {
     align-items: center;
     gap: 8px 12px;
     margin-top: 10px;
-    color: #6f6f6f;
+    color: var(--community-neutral-300);
     font-size: 14px;
 }
 
 .community-meta-author {
-    color: #171717;
+    color: var(--community-blue-600);
     font-weight: 700;
 }
 
@@ -1661,9 +1765,13 @@ a {
 }
 
 .community-meta-label {
-    color: #8f8f8f;
+    color: var(--community-neutral-400);
     font-size: 12px;
     font-weight: 700;
+}
+
+.community-like-meta {
+    color: var(--community-pink-600);
 }
 
 .community-edited-badge {
