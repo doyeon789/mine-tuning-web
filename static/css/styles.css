@@ -237,12 +237,8 @@ a {
     cursor: default;
 }
 
-.history-menu-action.future {
-    color: var(--color-stone);
-}
-
-.history-menu-action.future:hover {
-    background: var(--color-snow);
+.history-menu-action.pinned {
+    color: var(--color-link-blue);
 }
 
 .history-menu-icon,

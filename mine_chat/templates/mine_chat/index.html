@@ -37,12 +37,15 @@
                                     <button class="history-menu-action" type="button" data-history-rename-cancel>취소</button>
                                 </div>
                             </form>
-                            <button class="history-menu-action future" type="button" disabled aria-disabled="true">
-                                <svg class="history-menu-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path d="M12 2l2.7 6.2 6.7.6-5 4.5 1.5 6.6L12 16.5 6.1 20l1.5-6.6-5-4.5 6.7-.6Z"></path>
-                                </svg>
-                                <span>채팅 고정</span>
-                            </button>
+                            <form action="{% url 'mine_chat:session_pin' session.pk %}" method="post">
+                                {% csrf_token %}
+                                <button class="history-menu-action{% if session.is_pinned %} pinned{% endif %}" type="submit">
+                                    <svg class="history-menu-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M12 2l2.7 6.2 6.7.6-5 4.5 1.5 6.6L12 16.5 6.1 20l1.5-6.6-5-4.5 6.7-.6Z"></path>
+                                    </svg>
+                                    <span>{% if session.is_pinned %}고정 해제{% else %}채팅 고정{% endif %}</span>
+                                </button>
+                            </form>
                             <div class="history-menu-separator" aria-hidden="true"></div>
                             <form action="{% url 'mine_chat:session_delete' session.pk %}" method="post" data-confirm="이 채팅을 삭제할까요?">
                                 {% csrf_token %}
