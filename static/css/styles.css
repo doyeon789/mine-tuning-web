@@ -162,6 +162,7 @@ a {
     color: var(--color-stone);
     font-weight: 600;
     font-size: 17px;
+    line-height: 1;
 }
 
 .history-menu-button:hover {

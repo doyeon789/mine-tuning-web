@@ -20,7 +20,7 @@
                         <a class="history-link" href="{% url 'mine_chat:session_detail' session.pk %}">
                             {{ session.title }}
                         </a>
-                        <button class="history-menu-button" type="button" aria-label="채팅 메뉴" data-history-menu-button>...</button>
+                        <button class="history-menu-button" type="button" aria-label="채팅 메뉴" data-history-menu-button>•••</button>
                         <div class="history-menu" data-history-menu hidden>
                             <form class="history-rename-form" action="{% url 'mine_chat:session_update' session.pk %}" method="post">
                                 {% csrf_token %}
