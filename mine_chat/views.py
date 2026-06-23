@@ -29,8 +29,11 @@ def _user_sessions(user):
 
 
 def _chat_context(user, active_session=None, message_form=None, session_form=None):
+    sessions = list(_user_sessions(user))
     return {
-        "sessions": _user_sessions(user),
+        "sessions": sessions,
+        "pinned_sessions": [session for session in sessions if session.is_pinned],
+        "regular_sessions": [session for session in sessions if not session.is_pinned],
         "active_session": active_session,
         "message_form": message_form or ChatMessageForm(),
         "session_form": session_form or ChatSessionForm(instance=active_session),

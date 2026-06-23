@@ -37,6 +37,10 @@ a {
     --color-stone: #8f8f8f;
     --color-arctic-mist: #ececec;
     --color-link-blue: #007aff;
+    --color-pin-yellow: #f7c948;
+    --color-pin-yellow-soft: #fff6cc;
+    --color-pin-yellow-hover: #ffefad;
+    --color-pin-brown: #7a4f00;
     --font-ui-sans-serif: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
     --font-openai-sans: "OpenAI Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
 
@@ -126,6 +130,32 @@ a {
     gap: 4px;
 }
 
+.pinned-history {
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.pinned-title {
+    color: var(--color-carbon);
+    font-weight: 600;
+}
+
+.chat-history-title {
+    margin-top: 16px;
+}
+
+.history-pin-icon {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 15px;
+    color: currentColor;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+}
+
 .history-item {
     position: relative;
     display: grid;
@@ -134,21 +164,56 @@ a {
     border-radius: 10px;
 }
 
+.history-item.pinned {
+    grid-template-columns: minmax(0, 1fr) 28px 32px;
+}
+
 .history-item:hover,
 .history-item.active {
     background: var(--color-arctic-mist);
 }
 
+.history-item.pinned:hover,
+.history-item.pinned.active {
+    background: var(--color-arctic-mist);
+}
+
 .history-link {
-    display: block;
+    display: flex;
+    align-items: center;
+    min-width: 0;
     color: var(--color-carbon);
     padding: 6px 8px;
     font-size: 14px;
     line-height: 1.43;
     overflow: hidden;
     text-decoration: none;
+}
+
+.history-link-text {
+    min-width: 0;
+    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.history-pin-badge {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    justify-self: end;
+    border-radius: 8px;
+    color: var(--color-pin-brown);
+}
+
+.history-item.pinned:hover .history-pin-badge,
+.history-item.pinned.active .history-pin-badge {
+    background: var(--color-pin-yellow-soft);
+}
+
+.history-pin-icon {
+    color: currentColor;
 }
 
 .history-menu-button {
@@ -238,7 +303,8 @@ a {
 }
 
 .history-menu-action.pinned {
-    color: var(--color-link-blue);
+    color: var(--color-pin-brown);
+    background: var(--color-pin-yellow-soft);
 }
 
 .history-menu-icon,
@@ -283,6 +349,15 @@ a {
 
 .history-menu-action.danger:hover {
     background: #fef2f2;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
 }
 
 .community-link {
