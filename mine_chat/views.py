@@ -45,7 +45,13 @@ def _call_rag_api(question: str) -> str:
             headers={"ngrok-skip-browser-warning": "true"},
             timeout=60,
         )
-        return resp.json().get("answer", "답변을 가져오지 못했습니다.")
+        data = resp.json()
+        
+        answer = (
+            data.get("validation", {}).get("corrected_answer")
+            or "답변을 가져오지 못했습니다."
+        )
+        return answer
     except Exception as e:
         return f"API 연결 오류: {str(e)}"
     
