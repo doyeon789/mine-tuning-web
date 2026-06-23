@@ -51,31 +51,32 @@
         <div class="community-markdown">
             {{ post.content|markdown }}
         </div>
-        <div class="community-detail-like-actions">
-            {% if can_like_post %}
-                <form
-                    id="community-like-form"
-                    action="{% url 'community:post_like' post.pk %}"
-                    method="post"
-                >
-                    {% csrf_token %}
-                    <button
-                        id="community-like-button"
-                        class="community-like-button{% if is_liked %} is-active{% endif %}"
-                        type="submit"
-                        data-liked-label="좋아요 취소"
-                        data-unliked-label="좋아요"
-                    >
-                        {% if is_liked %}좋아요 취소{% else %}좋아요{% endif %}
-                    </button>
-                </form>
-            {% elif request.user.is_authenticated %}
-                <button class="community-like-button" type="button" disabled>좋아요</button>
-            {% else %}
-                <a class="community-secondary-link" href="{% url 'accounts:login' %}?next={{ request.path }}">좋아요</a>
-            {% endif %}
-        </div>
     </article>
+
+    <div class="community-detail-like-actions">
+        {% if can_like_post %}
+            <form
+                id="community-like-form"
+                action="{% url 'community:post_like' post.pk %}"
+                method="post"
+            >
+                {% csrf_token %}
+                <button
+                    id="community-like-button"
+                    class="community-like-button{% if is_liked %} is-active{% endif %}"
+                    type="submit"
+                    data-liked-label="좋아요 취소"
+                    data-unliked-label="좋아요"
+                >
+                    {% if is_liked %}좋아요 취소{% else %}좋아요{% endif %}
+                </button>
+            </form>
+        {% elif request.user.is_authenticated %}
+            <button class="community-like-button" type="button" disabled>좋아요</button>
+        {% else %}
+            <a class="community-secondary-link" href="{% url 'accounts:login' %}?next={{ request.path }}">좋아요</a>
+        {% endif %}
+    </div>
 
     <section class="community-comments" aria-label="댓글">
         <div class="community-comments-header">

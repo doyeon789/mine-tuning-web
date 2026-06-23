@@ -1305,9 +1305,6 @@ a {
 }
 
 .community-detail-card {
-    display: grid;
-    grid-template-rows: minmax(0, 1fr) auto;
-    gap: 20px;
     min-height: 260px;
     color: #171717;
     font-size: 17px;
@@ -1317,7 +1314,7 @@ a {
 .community-detail-like-actions {
     display: flex;
     justify-content: flex-end;
-    padding-top: 8px;
+    margin-top: 12px;
 }
 
 .community-detail-card .community-markdown p:first-child {
