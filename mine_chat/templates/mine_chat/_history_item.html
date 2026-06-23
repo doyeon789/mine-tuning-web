@@ -9,12 +9,11 @@
     <span class="history-link-text">{{ session.title }}</span>
   </a>
   {% if session.is_pinned %}
-  <span class="history-pin-badge" aria-label="고정됨" title="고정됨">
+  <span class="history-pin-badge" aria-label="즐겨찾기됨" title="즐겨찾기됨">
     <svg class="history-pin-icon" viewBox="0 0 24 24" aria-hidden="true">
       <path
-        d="M14 4l6 6-4 1.2-3.8 3.8.3 4.5-1.4 1.4-4.2-4.2-4.2-4.2 1.4-1.4 4.5.3L12.4 7 14 4Z"
+        d="M12 2.4l2.9 6 6.6.9-4.8 4.7 1.1 6.6L12 17.5l-5.8 3.1 1.1-6.6-4.8-4.7 6.6-.9L12 2.4Z"
       ></path>
-      <path d="M9 15l-5 5"></path>
     </svg>
   </span>
   {% endif %}
@@ -72,11 +71,10 @@
       >
         <svg class="history-menu-icon" viewBox="0 0 24 24" aria-hidden="true">
           <path
-            d="M14 4l6 6-4 1.2-3.8 3.8.3 4.5-1.4 1.4-4.2-4.2-4.2-4.2 1.4-1.4 4.5.3L12.4 7 14 4Z"
+            d="M12 2.4l2.9 6 6.6.9-4.8 4.7 1.1 6.6L12 17.5l-5.8 3.1 1.1-6.6-4.8-4.7 6.6-.9L12 2.4Z"
           ></path>
-          <path d="M9 15l-5 5"></path>
         </svg>
-        <span>{% if session.is_pinned %}고정 해제{% else %}채팅 고정{% endif %}</span>
+        <span>{% if session.is_pinned %}즐겨찾기 해제{% else %}즐겨찾기{% endif %}</span>
       </button>
     </form>
     <div class="history-menu-separator" aria-hidden="true"></div>
