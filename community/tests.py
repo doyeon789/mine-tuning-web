@@ -298,6 +298,21 @@ class PopularPostListViewTests(TestCase):
         self.assertContains(response, "메인 인기글")
         self.assertContains(response, "popular_period=weekly")
 
+    def test_community_page_shows_top_five_popular_posts(self):
+        for index in range(6):
+            Post.objects.create(
+                author=self.user,
+                title=f"인기글 {index + 1}",
+                content="본문",
+                view_count=10 - index,
+            )
+
+        response = self.client.get(reverse("community:post_list"))
+        popular_titles = [post.title for post in response.context["popular_posts"]]
+
+        self.assertContains(response, "community-popular-preview-rank", count=5)
+        self.assertEqual(popular_titles, [f"인기글 {index}" for index in range(1, 6)])
+
 
 class MarkdownImageUploadTests(TestCase):
     def setUp(self):

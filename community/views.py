@@ -41,6 +41,7 @@ POPULAR_PERIODS = {
     },
 }
 DEFAULT_POPULAR_PERIOD = "realtime"
+POPULAR_PREVIEW_LIMIT = 5
 
 
 def _matches_image_signature(content_type, header):
@@ -88,7 +89,7 @@ def post_list(request):
         "community/post_list.html",
         {
             "posts": posts,
-            "popular_posts": _popular_posts(popular_period)[:5],
+            "popular_posts": _popular_posts(popular_period)[:POPULAR_PREVIEW_LIMIT],
             "popular_periods": POPULAR_PERIODS,
             "popular_period": popular_period,
         },
