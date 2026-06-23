@@ -907,9 +907,36 @@ a {
     text-align: left;
 }
 
+.form-errors p {
+    margin: 4px 0 0;
+}
+
 .form-errors ul {
     margin: 0;
     padding-left: 18px;
+}
+
+.field-error {
+    margin: -4px 0 2px;
+    color: #a33a2a;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.auth-login-message {
+    color: #a33a2a;
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: left;
+}
+
+.auth-login-message strong {
+    display: block;
+    margin-bottom: 2px;
+}
+
+.auth-login-message p {
+    margin: 0;
 }
 
 .auth-visual {

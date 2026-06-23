@@ -51,6 +51,27 @@ class AccountViewsTests(TestCase):
         logout_response = self.client.post(reverse("accounts:logout"))
         self.assertRedirects(logout_response, reverse("accounts:login"))
 
+    def test_login_failure_uses_friendly_korean_message(self):
+        get_user_model().objects.create_user(
+            username="tester",
+            password="StrongPass123!",
+        )
+
+        response = self.client.post(
+            reverse("accounts:login"),
+            {"username": "tester", "password": "wrong-password"},
+        )
+
+        self.assertContains(response, "로그인할 수 없습니다.")
+        self.assertContains(
+            response,
+            "아이디 또는 비밀번호가 올바르지 않습니다. 다시 확인해 주세요.",
+        )
+        self.assertNotContains(
+            response,
+            "Please enter a correct username and password.",
+        )
+
     def test_delete_account_removes_current_user(self):
         get_user_model().objects.create_user(
             username="tester",
