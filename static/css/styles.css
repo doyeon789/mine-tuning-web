@@ -271,8 +271,76 @@ a {
     line-height: 1.43;
 }
 
-.account-button {
+.account-menu-wrap {
+    position: relative;
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 8px;
+    align-items: center;
+}
+
+.account-menu-button {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    padding: 7px 8px;
+}
+
+.account-menu-button:hover,
+.account-menu-button[aria-expanded="true"] {
+    background: var(--color-arctic-mist);
+}
+
+.account-menu-button span {
+    display: block;
+    width: 16px;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--color-carbon);
+}
+
+.account-menu {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 8px);
+    z-index: 6;
+    display: grid;
+    width: 180px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+    background: var(--color-snow);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+}
+
+.account-menu[hidden] {
+    display: none;
+}
+
+.account-menu form {
+    margin: 0;
+}
+
+.account-menu-action {
     width: 100%;
+    border: 0;
+    background: transparent;
+    color: var(--color-carbon);
+    padding: 10px 12px;
+    font-size: 14px;
+    text-align: left;
+}
+
+.account-menu-action:hover {
+    background: var(--color-arctic-mist);
+}
+
+.account-menu-action.danger {
+    color: #b42318;
 }
 
 .chat-main {

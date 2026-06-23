@@ -44,15 +44,30 @@
                 <strong>나에게 맞는 대화</strong>
                 <p>저장된 채팅을 기반으로 이어서 대화하세요.</p>
             </div>
-            <span class="account-name">{{ request.user.username }}</span>
-            <form action="{% url 'accounts:logout' %}" method="post" data-confirm="로그아웃할까요?">
-                {% csrf_token %}
-                <button class="small-button account-button" type="submit">로그아웃</button>
-            </form>
-            <form action="{% url 'accounts:delete' %}" method="post" data-confirm="계정을 삭제할까요? 계정 데이터가 모두 삭제됩니다.">
-                {% csrf_token %}
-                <button class="danger-button account-button" type="submit">회원탈퇴</button>
-            </form>
+            <div class="account-menu-wrap" data-account-menu-wrap>
+                <button
+                    class="account-menu-button"
+                    type="button"
+                    aria-label="계정 메뉴"
+                    aria-expanded="false"
+                    data-account-menu-button
+                >
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <span class="account-name">{{ request.user.username }}</span>
+                <div class="account-menu" data-account-menu hidden>
+                    <form action="{% url 'accounts:logout' %}" method="post" data-confirm="로그아웃할까요?">
+                        {% csrf_token %}
+                        <button class="account-menu-action" type="submit">로그아웃</button>
+                    </form>
+                    <form action="{% url 'accounts:delete' %}" method="post" data-confirm="계정을 삭제할까요? 계정 데이터가 모두 삭제됩니다.">
+                        {% csrf_token %}
+                        <button class="account-menu-action danger" type="submit">회원탈퇴</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </aside>
 
