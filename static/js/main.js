@@ -145,6 +145,8 @@
                 return;
             }
 
+            const submittedContent = contentInput.value.trim();
+
             form.dataset.submitting = "true";
             form.setAttribute("aria-busy", "true");
 
@@ -154,7 +156,18 @@
                 });
             });
 
-            if (contentInput instanceof HTMLTextAreaElement) {
+            if (contentInput.classList.contains("message-input")) {
+                const submittedContentInput = document.createElement("input");
+                submittedContentInput.type = "hidden";
+                submittedContentInput.name = "content";
+                submittedContentInput.value = contentInput.value;
+                form.appendChild(submittedContentInput);
+
+                contentInput.removeAttribute("name");
+                contentInput.required = false;
+                contentInput.value = "";
+                contentInput.readOnly = true;
+            } else if (contentInput instanceof HTMLTextAreaElement) {
                 contentInput.readOnly = true;
             }
 
@@ -176,7 +189,7 @@
             }
 
             showPendingResponse(
-                contentInput.value.trim(),
+                submittedContent,
                 !form.matches("[data-message-form]")
             );
         });
