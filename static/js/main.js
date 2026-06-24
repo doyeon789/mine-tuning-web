@@ -123,7 +123,16 @@
         }
     });
 
+    const resizeMessageInput = (textarea) => {
+        textarea.style.height = "auto";
+        textarea.style.height = `${Math.min(textarea.scrollHeight, 240)}px`;
+        textarea.style.overflowY =
+            textarea.scrollHeight > 240 ? "auto" : "hidden";
+    };
+
     document.querySelectorAll(".message-input").forEach((textarea) => {
+        resizeMessageInput(textarea);
+
         textarea.addEventListener("keydown", (event) => {
             if (event.key !== "Enter" || event.shiftKey || event.isComposing) {
                 return;
@@ -137,6 +146,8 @@
         });
 
         textarea.addEventListener("input", () => {
+            resizeMessageInput(textarea);
+
             if (textarea.dataset.preserveDraft !== "true") {
                 return;
             }
@@ -268,6 +279,7 @@
                 contentInput.removeAttribute("name");
                 contentInput.required = false;
                 contentInput.value = "";
+                resizeMessageInput(contentInput);
                 contentInput.dataset.preserveDraft = "true";
                 sessionStorage.removeItem(pendingDraftStorageKey);
             } else if (contentInput instanceof HTMLTextAreaElement) {
@@ -319,6 +331,7 @@
             messageInput.value = pendingDraft;
             sessionStorage.removeItem(pendingDraftStorageKey);
         }
+        resizeMessageInput(messageInput);
 
         messageInput.focus();
         messageInput.setSelectionRange(messageInput.value.length, messageInput.value.length);
