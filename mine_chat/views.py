@@ -1,3 +1,6 @@
+import time
+
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.models import DateTimeField, Max
 from django.db.models.functions import Coalesce
@@ -38,6 +41,10 @@ def _chat_context(user, active_session=None, message_form=None, session_form=Non
 
 
 def _create_assistant_response(session):
+    delay_seconds = settings.AI_RESPONSE_DELAY_SECONDS
+    if delay_seconds:
+        time.sleep(delay_seconds)
+
     return ChatMessage.objects.create(
         session=session,
         role=ChatMessage.Role.ASSISTANT,

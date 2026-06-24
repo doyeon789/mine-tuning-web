@@ -1,7 +1,8 @@
 from datetime import timedelta
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -9,6 +10,7 @@ from .models import ChatMessage, ChatSession
 from .views import SESSION_TITLE_MAX_LENGTH, _make_session_title, _user_sessions
 
 
+@override_settings(AI_RESPONSE_DELAY_SECONDS=0)
 class ChatViewsTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(
@@ -49,6 +51,18 @@ class ChatViewsTests(TestCase):
         self.assertEqual(session.messages.count(), 2)
         self.assertEqual(session.messages.first().role, ChatMessage.Role.USER)
         self.assertEqual(session.messages.first().content, "Hello")
+
+    @override_settings(AI_RESPONSE_DELAY_SECONDS=2)
+    @patch("mine_chat.views.time.sleep")
+    def test_configured_assistant_response_delay_is_applied(self, sleep):
+        session = ChatSession.objects.create(owner=self.user, title="Test chat")
+
+        self.client.post(
+            reverse("mine_chat:message_create", args=[session.pk]),
+            {"content": "Hello"},
+        )
+
+        sleep.assert_called_once_with(2)
 
     def test_existing_chat_renders_loading_state_hooks(self):
         session = ChatSession.objects.create(owner=self.user, title="Test chat")

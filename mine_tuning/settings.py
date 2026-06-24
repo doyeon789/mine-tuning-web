@@ -200,3 +200,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Optional local delay for checking the AI response loading UI.
+AI_RESPONSE_DELAY_SECONDS = max(
+    0.0,
+    float(os.getenv('AI_RESPONSE_DELAY_SECONDS', '0')),
+)
+
