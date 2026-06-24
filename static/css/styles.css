@@ -173,25 +173,6 @@ a {
   background: var(--color-history-hover);
 }
 
-.history-link {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  color: var(--color-carbon);
-  padding: 8px 9px;
-  font-size: 14px;
-  line-height: 1.43;
-  overflow: hidden;
-  text-decoration: none;
-}
-
-.history-link-text {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .history-favorite-form {
   display: grid;
   place-items: center;
@@ -302,17 +283,15 @@ a {
   display: none;
 }
 
-.history-inline-rename-form[hidden] {
-  display: none;
-}
-
-.history-inline-rename-form {
+.history-title-form {
   min-width: 0;
   padding: 0;
 }
 
-.history-inline-rename-input {
+.history-title-textarea {
+  display: block;
   width: 100%;
+  height: 36px;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -320,10 +299,18 @@ a {
   padding: 8px 9px;
   font-size: 14px;
   line-height: 1.43;
+  overflow: hidden;
+  resize: none;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
-.history-inline-rename-input:focus {
+.history-title-textarea:focus {
   outline: 0;
+}
+
+.history-title-textarea:not([readonly]) {
+  cursor: text;
 }
 
 .history-menu-action {

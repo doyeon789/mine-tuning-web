@@ -16,20 +16,12 @@
         document.querySelectorAll("[data-history-menu]").forEach((menu) => {
             menu.hidden = true;
             const item = menu.closest("[data-history-item]");
-            const renameForm = item.querySelector("[data-history-rename-form]");
-            const historyLink = item.querySelector("[data-history-link]");
+            const titleTextarea = item.querySelector("[data-history-title-textarea]");
             const renameButton = menu.querySelector("[data-history-rename-button]");
 
-            if (renameForm) {
-                renameForm.hidden = true;
-                const input = renameForm.querySelector("input");
-                if (input) {
-                    input.value = input.defaultValue;
-                }
-            }
-
-            if (historyLink) {
-                historyLink.hidden = false;
+            if (titleTextarea) {
+                titleTextarea.readOnly = true;
+                titleTextarea.value = titleTextarea.defaultValue;
             }
 
             if (renameButton) {
@@ -57,29 +49,37 @@
     document.querySelectorAll("[data-history-rename-button]").forEach((button) => {
         button.addEventListener("click", (event) => {
             event.stopPropagation();
-            const menu = button.closest("[data-history-menu]");
             const item = button.closest("[data-history-item]");
-            const form = item.querySelector("[data-history-rename-form]");
-            const historyLink = item.querySelector("[data-history-link]");
-            const input = form.querySelector("input");
+            const titleTextarea = item.querySelector("[data-history-title-textarea]");
 
             closeHistoryMenus();
-            historyLink.hidden = true;
             button.hidden = true;
-            form.hidden = false;
-            input.focus();
-            input.select();
+            titleTextarea.readOnly = false;
+            titleTextarea.focus();
+            titleTextarea.select();
         });
     });
 
-    document.querySelectorAll("[data-history-rename-form]").forEach((form) => {
-        const input = form.querySelector("input");
+    document.querySelectorAll("[data-history-title-form]").forEach((form) => {
+        const titleTextarea = form.querySelector("[data-history-title-textarea]");
 
-        input.addEventListener("keydown", (event) => {
+        titleTextarea.addEventListener("click", () => {
+            if (titleTextarea.readOnly) {
+                window.location.href = form.dataset.sessionUrl;
+            }
+        });
+
+        titleTextarea.addEventListener("keydown", (event) => {
             if (event.key === "Escape") {
                 event.preventDefault();
-                input.value = input.defaultValue;
+                titleTextarea.value = titleTextarea.defaultValue;
                 closeHistoryMenus();
+                return;
+            }
+
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                form.requestSubmit();
             }
         });
     });

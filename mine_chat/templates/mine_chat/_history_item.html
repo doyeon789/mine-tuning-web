@@ -2,28 +2,22 @@
   class="history-item{% if session.is_pinned %} pinned{% endif %}{% if active_session.pk == session.pk %} active{% endif %}"
   data-history-item
 >
-  <a
-    class="history-link"
-    href="{% url 'mine_chat:session_detail' session.pk %}"
-    data-history-link
-  >
-    <span class="history-link-text">{{ session.title }}</span>
-  </a>
   <form
-    class="history-inline-rename-form"
+    class="history-title-form"
     action="{% url 'mine_chat:session_update' session.pk %}"
     method="post"
-    data-history-rename-form
-    hidden
+    data-history-title-form
+    data-session-url="{% url 'mine_chat:session_detail' session.pk %}"
   >
     {% csrf_token %}
-    <input
-      class="history-inline-rename-input"
-      type="text"
+    <textarea
+      class="history-title-textarea"
       name="title"
-      value="{{ session.title }}"
+      rows="1"
+      readonly
       required
-    />
+      data-history-title-textarea
+    >{{ session.title }}</textarea>
   </form>
   <form class="history-favorite-form" action="{% url 'mine_chat:session_pin' session.pk %}" method="post">
     {% csrf_token %}
