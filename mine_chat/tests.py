@@ -78,12 +78,12 @@ class ChatViewsTests(TestCase):
     def test_session_title_is_based_on_first_question(self):
         response = self.client.post(
             reverse("mine_chat:session_create"),
-            {"content": "  다이아   캐는법\n알려줘  "},
+            {"content": "  다이아 어떻게 캐?  "},
         )
 
         session = ChatSession.objects.get()
         self.assertRedirects(response, reverse("mine_chat:session_detail", args=[session.pk]))
-        self.assertEqual(session.title, "다이아 캐는법 알려줘")
+        self.assertEqual(session.title, "다이아 캐는 법")
 
     def test_session_title_is_truncated_to_model_limit(self):
         long_question = "가" * 140
@@ -91,7 +91,22 @@ class ChatViewsTests(TestCase):
         title = _make_session_title(long_question)
 
         self.assertEqual(len(title), SESSION_TITLE_MAX_LENGTH)
-        self.assertTrue(title.endswith("..."))
+        self.assertNotIn("...", title)
+
+    def test_session_title_removes_request_ending_and_punctuation(self):
+        title = _make_session_title("엔더 드래곤 공략 알려주세요!")
+
+        self.assertEqual(title, "엔더 드래곤 공략")
+
+    def test_greeting_uses_default_session_title(self):
+        self.assertEqual(_make_session_title("ㅎㅇ"), "새 채팅")
+
+    def test_long_how_to_question_keeps_core_topic(self):
+        title = _make_session_title(
+            "마인크래프트에서 다이아몬드를 가장 빠르게 찾는 방법을 자세히 설명해주세요"
+        )
+
+        self.assertEqual(title, "다이아몬드 찾는 방법")
 
     def test_sessions_order_by_latest_message_not_rename_time(self):
         older_session = ChatSession.objects.create(owner=self.user, title="Older")

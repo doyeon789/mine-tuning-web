@@ -6,12 +6,25 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 import requests
 import os
+import re
 
 from .forms import ChatMessageForm, ChatSessionForm
 from .models import ChatMessage, ChatSession
 
 NGROK_URL = os.environ.get("NGROK_URL", "https://eligibly-shove-cartload.ngrok-free.dev")
-SESSION_TITLE_MAX_LENGTH = 32
+SESSION_TITLE_MAX_LENGTH = 15
+DEFAULT_SESSION_TITLE = "새 채팅"
+
+TITLE_QUESTION_PATTERNS = (
+    (r"^(.+?)\s+어떻게\s+캐(?:요|나요|지|야)?$", r"\1 캐는 법"),
+    (r"^(.+?)\s+어떻게\s+가(?:요|나요|지|야)?$", r"\1 가는 법"),
+    (r"^(.+?)\s+어떻게\s+만들(?:어|어요|지|까)?$", r"\1 만드는 법"),
+    (r"^(.+?)\s+어떻게\s+얻(?:어|어요|지|지요|나요)?$", r"\1 얻는 법"),
+    (r"^(.+?)\s+어떻게\s+찾(?:아|아요|지|나요)?$", r"\1 찾는 법"),
+    (r"^(.+?)\s+어떻게\s+잡(?:아|아요|지|나요)?$", r"\1 잡는 법"),
+    (r"^(.+?)\s+어떻게\s+쓰(?:지|나요|는 거야)?$", r"\1 쓰는 법"),
+    (r"^(.+?)\s+어떻게\s+해(?:요|야|야 해|야 돼|야 하나요)?$", r"\1 하는 법"),
+)
 
 
 def _user_sessions(user):
@@ -84,10 +97,41 @@ def _delete_messages_after(user_message):
 
 
 def _make_session_title(content):
-    title = " ".join(content.split())
+    title = " ".join(content.split()).strip()
+    title = re.sub(r"[?!.,。！？]+", "", title).strip()
+
+    if title.casefold() in {"hi", "hello", "ㅎㅇ", "안녕", "안녕하세요"}:
+        return DEFAULT_SESSION_TITLE
+
+    for pattern, replacement in TITLE_QUESTION_PATTERNS:
+        if re.fullmatch(pattern, title):
+            title = re.sub(pattern, replacement, title)
+            break
+
+    title = re.sub(
+        r"\s*(?:(?:자세히\s*)?알려\s*줘|(?:자세히\s*)?알려\s*주세요|"
+        r"(?:자세히\s*)?설명해\s*줘|(?:자세히\s*)?설명해\s*주세요|"
+        r"(?:자세히\s*)?가르쳐\s*줘|(?:자세히\s*)?가르쳐\s*주세요)$",
+        "",
+        title,
+    ).strip()
+    title = re.sub(
+        r"^(?:마인크래프트에서\s+)?(.+?)(?:을|를)\s+"
+        r"(?:(?:가장\s+)?빠르게\s+)?(.+?는)\s+방법(?:을)?$",
+        r"\1 \2 방법",
+        title,
+    )
+    title = re.sub(r"는\s*법", "는 법", title)
+
+    if not title:
+        return DEFAULT_SESSION_TITLE
     if len(title) <= SESSION_TITLE_MAX_LENGTH:
         return title
-    return title[: SESSION_TITLE_MAX_LENGTH - 3].rstrip() + "..."
+
+    shortened_title = title[:SESSION_TITLE_MAX_LENGTH].rstrip()
+    if " " in shortened_title:
+        shortened_title = shortened_title.rsplit(" ", 1)[0]
+    return shortened_title or title[:SESSION_TITLE_MAX_LENGTH].rstrip()
 
 
 @login_required
