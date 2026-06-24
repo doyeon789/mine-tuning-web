@@ -7,7 +7,15 @@
             <h1 class="brand">MINE_TUNING</h1>
             <form action="{% url 'mine_chat:index' %}" method="get">
                 <input type="hidden" name="new" value="1">
-                <button class="new-chat" type="submit"><span class="nav-icon">+</span><span>새 채팅</span></button>
+                <button class="new-chat" type="submit">
+                    <span class="nav-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 5v14"></path>
+                            <path d="M5 12h14"></path>
+                        </svg>
+                    </span>
+                    <span>새 채팅</span>
+                </button>
             </form>
             <a class="community-link" href="/community/">커뮤니티로</a>
         </div>
@@ -104,7 +112,12 @@
                 <div class="composer-inner">
                     {{ message_form.content }}
                     <button class="send-button" type="submit" aria-label="전송">
-                        <span class="send-button-icon" aria-hidden="true">↑</span>
+                        <span class="send-button-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 19V5"></path>
+                                <path d="M5 12l7-7 7 7"></path>
+                            </svg>
+                        </span>
                         <span class="send-button-loader" aria-hidden="true"></span>
                     </button>
                 </div>
@@ -118,7 +131,12 @@
                     <div class="composer-inner">
                         {{ message_form.content }}
                         <button class="send-button" type="submit" aria-label="전송">
-                            <span class="send-button-icon" aria-hidden="true">↑</span>
+                            <span class="send-button-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M12 19V5"></path>
+                                    <path d="M5 12l7-7 7 7"></path>
+                                </svg>
+                            </span>
                             <span class="send-button-loader" aria-hidden="true"></span>
                         </button>
                     </div>
