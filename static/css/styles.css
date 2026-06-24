@@ -36,6 +36,7 @@ a {
     --color-pewter: #5d5d5d;
     --color-stone: #8f8f8f;
     --color-arctic-mist: #ececec;
+    --color-history-hover: rgba(0, 0, 0, 0.035);
     --color-link-blue: #007aff;
     --color-pin-yellow: #f7c948;
     --color-pin-yellow-soft: #fff6cc;
@@ -164,12 +165,12 @@ a {
 
 .history-item:hover,
 .history-item.active {
-    background: var(--color-arctic-mist);
+    background: var(--color-history-hover);
 }
 
 .history-item.pinned:hover,
 .history-item.pinned.active {
-    background: var(--color-arctic-mist);
+    background: var(--color-history-hover);
 }
 
 .history-link {
