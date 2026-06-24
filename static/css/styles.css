@@ -646,24 +646,11 @@ a {
 }
 
 .chat-topbar {
-  display: flex;
-  align-items: center;
-  min-height: 48px;
-  border-bottom: 0;
-  background: transparent;
-  padding: 10px 24px 0;
-  color: var(--color-pewter);
-  font-size: 13px;
-  line-height: 1.43;
+  display: none;
 }
 
 .chat-topbar span {
-  display: block;
-  max-width: 32ch;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: none;
 }
 
 .text-input {
@@ -799,6 +786,10 @@ a {
 
 .message.user {
   justify-self: end;
+}
+
+.message-list > .message.user:first-child {
+  margin-top: 36px;
 }
 
 .message.user.editing {
