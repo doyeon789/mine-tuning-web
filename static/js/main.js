@@ -1,5 +1,6 @@
 ﻿document.addEventListener("DOMContentLoaded", () => {
     const pendingDraftStorageKey = "mine-chat-pending-draft";
+    let isChatResponsePending = false;
     const messageScroll = document.querySelector("[data-message-scroll]");
     if (messageScroll) {
         messageScroll.scrollTop = messageScroll.scrollHeight;
@@ -196,7 +197,7 @@
 
     document.querySelectorAll("[data-chat-submit-form]").forEach((form) => {
         form.addEventListener("submit", (event) => {
-            if (form.dataset.submitting === "true") {
+            if (isChatResponsePending || form.dataset.submitting === "true") {
                 event.preventDefault();
                 return;
             }
@@ -209,6 +210,7 @@
 
             const submittedContent = contentInput.value.trim();
 
+            isChatResponsePending = true;
             form.dataset.submitting = "true";
             form.setAttribute("aria-busy", "true");
 
@@ -232,6 +234,17 @@
                 sessionStorage.removeItem(pendingDraftStorageKey);
             } else if (contentInput instanceof HTMLTextAreaElement) {
                 contentInput.readOnly = true;
+
+                const messageComposerInput = document.querySelector(".message-input");
+                if (messageComposerInput) {
+                    messageComposerInput.dataset.preserveDraft = "true";
+                    if (messageComposerInput.value) {
+                        sessionStorage.setItem(
+                            pendingDraftStorageKey,
+                            messageComposerInput.value
+                        );
+                    }
+                }
             }
 
             const firstChat = document.querySelector("[data-first-chat]");
