@@ -30,6 +30,9 @@
                 renameButton.hidden = false;
             }
         });
+        document.querySelectorAll("[data-history-menu-button]").forEach((button) => {
+            button.setAttribute("aria-expanded", "false");
+        });
     };
     
     document.querySelectorAll("[data-history-menu-button]").forEach((button) => {
@@ -41,6 +44,7 @@
 
             closeHistoryMenus();
             menu.hidden = !shouldOpen;
+            button.setAttribute("aria-expanded", String(shouldOpen));
         });
     });
 

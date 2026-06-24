@@ -200,10 +200,18 @@ a {
     justify-self: end;
     border-radius: 8px;
     color: var(--color-pin-brown);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 120ms ease, background-color 120ms ease;
+}
+
+.history-item:hover .history-pin-badge,
+.history-item:focus-within .history-pin-badge {
+    opacity: 1;
 }
 
 .history-item.pinned:hover .history-pin-badge,
-.history-item.pinned.active .history-pin-badge {
+.history-item.pinned:focus-within .history-pin-badge {
     background: var(--color-pin-yellow-soft);
 }
 
@@ -223,6 +231,16 @@ a {
     font-weight: 600;
     font-size: 12px;
     line-height: 1;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 120ms ease, background-color 120ms ease;
+}
+
+.history-item:hover .history-menu-button,
+.history-item:focus-within .history-menu-button,
+.history-menu-button[aria-expanded="true"] {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .history-menu-button:hover {
