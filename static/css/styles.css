@@ -129,7 +129,7 @@ a {
 .history-item {
     position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 32px;
+    grid-template-columns: minmax(0, 1fr) 36px;
     align-items: center;
     border-radius: 10px;
 }
