@@ -195,6 +195,21 @@
         }
     };
 
+    const removeMessagesAfter = (form) => {
+        if (!form.matches("[data-message-form]")) {
+            return;
+        }
+
+        const editedMessage = form.closest(".message");
+        let nextMessage = editedMessage?.nextElementSibling;
+
+        while (nextMessage) {
+            const messageToRemove = nextMessage;
+            nextMessage = nextMessage.nextElementSibling;
+            messageToRemove.remove();
+        }
+    };
+
     document.querySelectorAll("[data-chat-submit-form]").forEach((form) => {
         form.addEventListener("submit", (event) => {
             if (isChatResponsePending || form.dataset.submitting === "true") {
@@ -246,6 +261,8 @@
                     }
                 }
             }
+
+            removeMessagesAfter(form);
 
             const firstChat = document.querySelector("[data-first-chat]");
             if (firstChat) {
