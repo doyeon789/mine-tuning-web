@@ -24,6 +24,8 @@ class ChatViewsTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Where should we begin?")
+        self.assertContains(response, "data-chat-submit-form")
+        self.assertContains(response, "data-pending-response-host")
         self.assertEqual(ChatSession.objects.count(), 1)
         self.assertNotContains(response, '<div class="chat-topbar">', html=False)
 
@@ -45,6 +47,17 @@ class ChatViewsTests(TestCase):
         self.assertEqual(session.messages.count(), 2)
         self.assertEqual(session.messages.first().role, ChatMessage.Role.USER)
         self.assertEqual(session.messages.first().content, "Hello")
+
+    def test_existing_chat_renders_loading_state_hooks(self):
+        session = ChatSession.objects.create(owner=self.user, title="Test chat")
+
+        response = self.client.get(
+            reverse("mine_chat:session_detail", args=[session.pk])
+        )
+
+        self.assertContains(response, "data-chat-submit-form")
+        self.assertContains(response, "data-pending-response-host")
+        self.assertContains(response, "send-button-loader")
 
     def test_create_session_with_content_starts_chat(self):
         response = self.client.post(

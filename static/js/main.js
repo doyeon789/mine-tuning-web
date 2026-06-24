@@ -86,6 +86,75 @@
         });
     });
 
+    const showPendingResponse = () => {
+        const host = document.querySelector("[data-pending-response-host]");
+        if (!host || host.querySelector("[data-pending-response]")) {
+            return;
+        }
+
+        const pendingResponse = document.createElement("article");
+        pendingResponse.className = "message assistant pending-response";
+        pendingResponse.dataset.pendingResponse = "";
+        pendingResponse.setAttribute("role", "status");
+        pendingResponse.setAttribute("aria-live", "polite");
+        pendingResponse.innerHTML = `
+            <div class="message-content pending-response-content">
+                <span>답변 생성 중</span>
+                <span class="pending-response-dots" aria-hidden="true">
+                    <span></span><span></span><span></span>
+                </span>
+            </div>
+        `;
+
+        host.hidden = false;
+        host.appendChild(pendingResponse);
+
+        const messageScroll = document.querySelector("[data-message-scroll]");
+        if (messageScroll) {
+            messageScroll.scrollTop = messageScroll.scrollHeight;
+        }
+    };
+
+    document.querySelectorAll("[data-chat-submit-form]").forEach((form) => {
+        form.addEventListener("submit", (event) => {
+            if (form.dataset.submitting === "true") {
+                event.preventDefault();
+                return;
+            }
+
+            const contentInput = form.querySelector("[name='content']");
+            if (!contentInput || !contentInput.value.trim()) {
+                event.preventDefault();
+                return;
+            }
+
+            form.dataset.submitting = "true";
+            form.setAttribute("aria-busy", "true");
+
+            document.querySelectorAll("[data-chat-submit-form]").forEach((chatForm) => {
+                chatForm.querySelectorAll("button[type='submit']").forEach((button) => {
+                    button.disabled = true;
+                });
+            });
+
+            if (contentInput instanceof HTMLTextAreaElement) {
+                contentInput.readOnly = true;
+            }
+
+            const submitButton = form.querySelector("button[type='submit']");
+            if (submitButton?.classList.contains("send-button")) {
+                submitButton.classList.add("is-loading");
+                submitButton.setAttribute("aria-label", "답변 생성 중");
+            } else if (submitButton) {
+                submitButton.classList.add("is-loading");
+                submitButton.textContent = "생성 중...";
+                submitButton.setAttribute("aria-label", "답변 생성 중");
+            }
+
+            showPendingResponse();
+        });
+    });
+
     const messageInput = document.querySelector(".message-input");
     if (messageInput) {
         messageInput.focus();

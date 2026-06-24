@@ -74,11 +74,11 @@
             </div>
 
             <section class="messages" aria-label="메시지" data-message-scroll>
-                <div class="message-list">
+                <div class="message-list" data-pending-response-host>
                     {% for message in active_session.messages.all %}
                         <article class="message {{ message.role }}">
                             {% if message.role == "user" %}
-                                <form class="message-edit-form" action="{% url 'mine_chat:message_update' message.pk %}" method="post" data-message-form>
+                                <form class="message-edit-form" action="{% url 'mine_chat:message_update' message.pk %}" method="post" data-message-form data-chat-submit-form>
                                     {% csrf_token %}
                                     <div class="message-content" data-message-text>{{ message.content }}</div>
                                     <textarea class="message-edit-input" name="content" rows="2" required hidden>{{ message.content }}</textarea>
@@ -102,35 +102,42 @@
                 </div>
             </section>
 
-            <form class="composer" action="{% url 'mine_chat:message_create' active_session.pk %}" method="post">
+            <form class="composer" action="{% url 'mine_chat:message_create' active_session.pk %}" method="post" data-chat-submit-form>
                 {% csrf_token %}
                 <div class="composer-inner">
                     {{ message_form.content }}
-                    <button class="send-button" type="submit" aria-label="전송">↑</button>
+                    <button class="send-button" type="submit" aria-label="전송">
+                        <span class="send-button-icon" aria-hidden="true">↑</span>
+                        <span class="send-button-loader" aria-hidden="true"></span>
+                    </button>
                 </div>
             </form>
         {% else %}
             <section class="first-chat">
                 <h2>Where should we begin?</h2>
-                <form class="composer first-chat-composer" action="{% url 'mine_chat:session_create' %}" method="post">
+                <form class="composer first-chat-composer" action="{% url 'mine_chat:session_create' %}" method="post" data-chat-submit-form>
                     {% csrf_token %}
                     <div class="composer-inner">
                         {{ message_form.content }}
-                        <button class="send-button" type="submit" aria-label="전송">↑</button>
+                        <button class="send-button" type="submit" aria-label="전송">
+                            <span class="send-button-icon" aria-hidden="true">↑</span>
+                            <span class="send-button-loader" aria-hidden="true"></span>
+                        </button>
                     </div>
                 </form>
+                <div class="message-list pending-message-list" data-pending-response-host hidden></div>
                 <div class="example-questions" aria-label="예시 질문">
-                    <form action="{% url 'mine_chat:session_create' %}" method="post">
+                    <form action="{% url 'mine_chat:session_create' %}" method="post" data-chat-submit-form>
                         {% csrf_token %}
                         <input type="hidden" name="content" value="다이아 캐는법">
                         <button class="example-question-button" type="submit">다이아 캐는법</button>
                     </form>
-                    <form action="{% url 'mine_chat:session_create' %}" method="post">
+                    <form action="{% url 'mine_chat:session_create' %}" method="post" data-chat-submit-form>
                         {% csrf_token %}
                         <input type="hidden" name="content" value="엔더월드 가는법">
                         <button class="example-question-button" type="submit">엔더월드 가는법</button>
                     </form>
-                    <form action="{% url 'mine_chat:session_create' %}" method="post">
+                    <form action="{% url 'mine_chat:session_create' %}" method="post" data-chat-submit-form>
                         {% csrf_token %}
                         <input type="hidden" name="content" value="지옥 가는법">
                         <button class="example-question-button" type="submit">지옥 가는법</button>
