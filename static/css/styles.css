@@ -215,6 +215,17 @@ a {
     flex-basis: 18px;
 }
 
+.regular-history .history-favorite-button {
+    width: 22px;
+    height: 22px;
+}
+
+.regular-history .history-favorite-button .history-pin-icon {
+    width: 15px;
+    height: 15px;
+    flex-basis: 15px;
+}
+
 .history-favorite-button.favorited {
     color: var(--color-pin-yellow);
 }
