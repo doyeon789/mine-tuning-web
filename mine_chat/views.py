@@ -16,8 +16,8 @@ TITLE_API_URL = os.environ.get(
     "TITLE_API_URL",
     "http://127.0.0.1:8100/api/titles/",
 )
-TITLE_API_TIMEOUT_SECONDS = float(os.environ.get("TITLE_API_TIMEOUT_SECONDS", "10"))
-SESSION_TITLE_MAX_LENGTH = 15
+TITLE_API_TIMEOUT_SECONDS = float(os.environ.get("TITLE_API_TIMEOUT_SECONDS", "30"))
+SESSION_TITLE_MAX_LENGTH = 40
 DEFAULT_SESSION_TITLE = "새 채팅"
 
 TITLE_QUESTION_PATTERNS = (
@@ -87,12 +87,37 @@ def _normalize_generated_title(title):
     return title[:SESSION_TITLE_MAX_LENGTH].rstrip()
 
 
+def _answer_for_title(answer):
+    if not isinstance(answer, str):
+        return ""
+
+    cleaned = " ".join(answer.split()).strip()
+    lowered = cleaned.casefold()
+    if not cleaned:
+        return ""
+    if lowered.startswith("api "):
+        return ""
+    if any(
+        marker in lowered
+        for marker in (
+            "connection error",
+            "connection failed",
+            "failed to connect",
+            "request failed",
+            "service unavailable",
+            "unable to fetch",
+        )
+    ):
+        return ""
+    return cleaned
+
+
 def _call_title_api(question, answer):
     response = requests.post(
         TITLE_API_URL,
         json={
             "question": question,
-            "answer": answer,
+            "answer": _answer_for_title(answer),
         },
         timeout=TITLE_API_TIMEOUT_SECONDS,
     )
@@ -145,6 +170,29 @@ def _delete_messages_after(user_message):
 def _make_session_title(content):
     title = " ".join(content.split()).strip()
     title = re.sub(r"[?!.,。！？]+", "", title).strip()
+
+    intent_match = re.fullmatch(
+        r"(?:how\s+(?:do|can|should)\s+i|how\s+to)\s+"
+        r"(craft|make|build|get|obtain|find|locate|reach|defeat|beat|use)\s+"
+        r"(?:(a|an|the)\s+)?(.+)",
+        title,
+        flags=re.IGNORECASE,
+    )
+    if intent_match:
+        action, article, subject = intent_match.groups()
+        subject = subject.strip().title()
+        subject_with_article = f"{article.casefold()} {subject}" if article else subject
+        action = action.casefold()
+        if action in {"craft", "make", "build"}:
+            title = f"How to Craft {subject_with_article}"
+        elif action in {"get", "obtain"}:
+            title = f"How to Get {subject_with_article}"
+        elif action in {"find", "locate", "reach"}:
+            title = f"How to Find {subject_with_article}"
+        elif action in {"defeat", "beat"}:
+            title = f"How to Defeat {subject_with_article}"
+        else:
+            title = f"How to Use {subject_with_article}"
 
     if title.casefold() in {"hi", "hello", "ㅎㅇ", "안녕", "안녕하세요"}:
         return DEFAULT_SESSION_TITLE

@@ -163,6 +163,12 @@ class ChatViewsTests(TestCase):
     def test_greeting_uses_default_session_title(self):
         self.assertEqual(_make_session_title("ㅎㅇ"), "새 채팅")
 
+    def test_english_crafting_question_keeps_subject(self):
+        self.assertEqual(
+            _make_session_title("How do I craft an iron pickaxe?"),
+            "How to Craft an Iron Pickaxe",
+        )
+
     def test_long_how_to_question_keeps_core_topic(self):
         title = _make_session_title(
             "마인크래프트에서 다이아몬드를 가장 빠르게 찾는 방법을 자세히 설명해주세요"
@@ -185,6 +191,25 @@ class ChatViewsTests(TestCase):
             {
                 "question": "다이아 어떻게 캐?",
                 "answer": "Y -59를 탐색하세요.",
+            },
+        )
+
+    @patch("mine_chat.views.requests.post")
+    def test_title_api_ignores_connection_error_answer(self, post):
+        post.return_value.json.return_value = {"title": "Beacon Crafting"}
+
+        title = _call_title_api(
+            "How do I craft a beacon?",
+            "API connection error: timed out",
+        )
+
+        self.assertEqual(title, "Beacon Crafting")
+        post.assert_called_once()
+        self.assertEqual(
+            post.call_args.kwargs["json"],
+            {
+                "question": "How do I craft a beacon?",
+                "answer": "",
             },
         )
 
