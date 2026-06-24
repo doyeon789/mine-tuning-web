@@ -12,6 +12,11 @@ from .forms import ChatMessageForm, ChatSessionForm
 from .models import ChatMessage, ChatSession
 
 NGROK_URL = os.environ.get("NGROK_URL", "https://eligibly-shove-cartload.ngrok-free.dev")
+TITLE_API_URL = os.environ.get(
+    "TITLE_API_URL",
+    "http://127.0.0.1:8100/api/titles/",
+)
+TITLE_API_TIMEOUT_SECONDS = float(os.environ.get("TITLE_API_TIMEOUT_SECONDS", "10"))
 SESSION_TITLE_MAX_LENGTH = 15
 DEFAULT_SESSION_TITLE = "새 채팅"
 
@@ -72,7 +77,33 @@ def _call_rag_api(question: str) -> str:
         return f"API 연결 오류: {str(e)}"
     
 
-def _create_assistant_response(session):
+def _normalize_generated_title(title):
+    if not isinstance(title, str):
+        return ""
+
+    title = " ".join(title.split()).strip()
+    title = title.strip("\"'`“”‘’[](){}")
+    title = re.sub(r"[?!.,。！？]+$", "", title).strip()
+    return title[:SESSION_TITLE_MAX_LENGTH].rstrip()
+
+
+def _call_title_api(question, answer):
+    response = requests.post(
+        TITLE_API_URL,
+        json={
+            "question": question,
+            "answer": answer,
+        },
+        timeout=TITLE_API_TIMEOUT_SECONDS,
+    )
+    response.raise_for_status()
+    data = response.json()
+    if not isinstance(data, dict):
+        return ""
+    return _normalize_generated_title(data.get("title"))
+
+
+def _create_assistant_response(session, update_title=False):
     last_user_message = session.messages.filter(
         role=ChatMessage.Role.USER
     ).last()
@@ -82,11 +113,26 @@ def _create_assistant_response(session):
     else:
         answer = "질문을 찾을 수 없습니다."
 
-    return ChatMessage.objects.create(
+    assistant_message = ChatMessage.objects.create(
         session=session,
         role=ChatMessage.Role.ASSISTANT,
         content=answer,
     )
+
+    if update_title and last_user_message:
+        fallback_title = _make_session_title(last_user_message.content)
+        try:
+            generated_title = _call_title_api(
+                last_user_message.content,
+                answer,
+            )
+        except (requests.RequestException, ValueError, TypeError):
+            generated_title = ""
+
+        session.title = generated_title or fallback_title
+        session.save(update_fields=["title"])
+
+    return assistant_message
 
 
 def _delete_messages_after(user_message):
@@ -161,12 +207,12 @@ def session_create(request):
     message = form.save(commit=False)
     session = ChatSession.objects.create(
         owner=request.user,
-        title=_make_session_title(message.content),
+        title=DEFAULT_SESSION_TITLE,
     )
     message.session = session
     message.role = ChatMessage.Role.USER
     message.save()
-    _create_assistant_response(session)
+    _create_assistant_response(session, update_title=True)
 
     return redirect("mine_chat:session_detail", pk=session.pk)
 

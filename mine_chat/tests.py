@@ -1,12 +1,19 @@
 from datetime import timedelta
+from unittest.mock import patch
 
+import requests
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
 from .models import ChatMessage, ChatSession
-from .views import SESSION_TITLE_MAX_LENGTH, _make_session_title, _user_sessions
+from .views import (
+    SESSION_TITLE_MAX_LENGTH,
+    _call_title_api,
+    _make_session_title,
+    _user_sessions,
+)
 
 
 class ChatViewsTests(TestCase):
@@ -61,7 +68,12 @@ class ChatViewsTests(TestCase):
         self.assertContains(response, "data-pending-response-host")
         self.assertContains(response, "send-button-loader")
 
-    def test_create_session_with_content_starts_chat(self):
+    @patch("mine_chat.views._call_title_api")
+    @patch("mine_chat.views._call_rag_api")
+    def test_create_session_with_content_starts_chat(self, call_rag_api, call_title_api):
+        call_rag_api.return_value = "Generated answer"
+        call_title_api.return_value = "Generated title"
+
         response = self.client.post(
             reverse("mine_chat:session_create"),
             {"content": "First message"},
@@ -70,12 +82,22 @@ class ChatViewsTests(TestCase):
         session = ChatSession.objects.get()
         self.assertRedirects(response, reverse("mine_chat:session_detail", args=[session.pk]))
         self.assertEqual(session.owner, self.user)
-        self.assertEqual(session.title, "First message")
+        self.assertEqual(session.title, "Generated title")
         self.assertEqual(session.messages.count(), 2)
         self.assertEqual(session.messages.first().role, ChatMessage.Role.USER)
         self.assertEqual(session.messages.first().content, "First message")
+        call_title_api.assert_called_once_with("First message", "Generated answer")
 
-    def test_session_title_is_based_on_first_question(self):
+    @patch("mine_chat.views._call_title_api")
+    @patch("mine_chat.views._call_rag_api")
+    def test_session_title_is_received_from_title_server(
+        self,
+        call_rag_api,
+        call_title_api,
+    ):
+        call_rag_api.return_value = "다이아몬드는 Y -59 부근에서 찾기 좋습니다."
+        call_title_api.return_value = "다이아몬드 채굴법"
+
         response = self.client.post(
             reverse("mine_chat:session_create"),
             {"content": "  다이아 어떻게 캐?  "},
@@ -83,7 +105,47 @@ class ChatViewsTests(TestCase):
 
         session = ChatSession.objects.get()
         self.assertRedirects(response, reverse("mine_chat:session_detail", args=[session.pk]))
+        self.assertEqual(session.title, "다이아몬드 채굴법")
+
+    @patch("mine_chat.views._call_title_api")
+    @patch("mine_chat.views._call_rag_api")
+    def test_session_title_uses_fallback_when_title_server_fails(
+        self,
+        call_rag_api,
+        call_title_api,
+    ):
+        call_rag_api.return_value = "Generated answer"
+        call_title_api.side_effect = requests.RequestException("unavailable")
+
+        self.client.post(
+            reverse("mine_chat:session_create"),
+            {"content": "다이아 어떻게 캐?"},
+        )
+
+        session = ChatSession.objects.get()
         self.assertEqual(session.title, "다이아 캐는 법")
+
+    @patch("mine_chat.views._call_title_api")
+    @patch("mine_chat.views._call_rag_api")
+    def test_later_messages_do_not_change_session_title(
+        self,
+        call_rag_api,
+        call_title_api,
+    ):
+        call_rag_api.return_value = "Generated answer"
+        session = ChatSession.objects.create(
+            owner=self.user,
+            title="사용자 지정 제목",
+        )
+
+        self.client.post(
+            reverse("mine_chat:message_create", args=[session.pk]),
+            {"content": "다음 질문"},
+        )
+
+        session.refresh_from_db()
+        self.assertEqual(session.title, "사용자 지정 제목")
+        call_title_api.assert_not_called()
 
     def test_session_title_is_truncated_to_model_limit(self):
         long_question = "가" * 140
@@ -107,6 +169,24 @@ class ChatViewsTests(TestCase):
         )
 
         self.assertEqual(title, "다이아몬드 찾는 방법")
+
+    @patch("mine_chat.views.requests.post")
+    def test_title_api_sends_question_and_answer(self, post):
+        post.return_value.json.return_value = {
+            "title": '"다이아몬드 채굴법!"',
+        }
+
+        title = _call_title_api("다이아 어떻게 캐?", "Y -59를 탐색하세요.")
+
+        self.assertEqual(title, "다이아몬드 채굴법")
+        post.assert_called_once()
+        self.assertEqual(
+            post.call_args.kwargs["json"],
+            {
+                "question": "다이아 어떻게 캐?",
+                "answer": "Y -59를 탐색하세요.",
+            },
+        )
 
     def test_sessions_order_by_latest_message_not_rename_time(self):
         older_session = ChatSession.objects.create(owner=self.user, title="Older")
