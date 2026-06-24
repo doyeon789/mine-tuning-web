@@ -171,6 +171,18 @@ def _make_session_title(content):
     title = " ".join(content.split()).strip()
     title = re.sub(r"[?!.,。！？]+", "", title).strip()
 
+    recipe_match = re.fullmatch(
+        r"what(?:'s|\s+is)\s+the\s+(?:crafting\s+)?recipe\s+(?:of|for)\s+"
+        r"(?:(a|an|the)\s+)?(.+)",
+        title,
+        flags=re.IGNORECASE,
+    )
+    if recipe_match:
+        article, subject = recipe_match.groups()
+        subject = subject.strip().title()
+        subject_with_article = f"{article.casefold()} {subject}" if article else subject
+        title = f"How to Make {subject_with_article}"
+
     intent_match = re.fullmatch(
         r"(?:how\s+(?:do|can|should)\s+i|how\s+to)\s+"
         r"(craft|make|build|get|obtain|find|locate|reach|defeat|beat|use)\s+"
@@ -178,7 +190,7 @@ def _make_session_title(content):
         title,
         flags=re.IGNORECASE,
     )
-    if intent_match:
+    if intent_match and not recipe_match:
         action, article, subject = intent_match.groups()
         subject = subject.strip().title()
         subject_with_article = f"{article.casefold()} {subject}" if article else subject
@@ -194,7 +206,7 @@ def _make_session_title(content):
         else:
             title = f"How to Use {subject_with_article}"
 
-    else:
+    elif not recipe_match:
         generic_how_match = re.fullmatch(
             r"(?:how\s+(?:do|can|should)\s+i|how\s+to)\s+(.+)",
             title,

@@ -175,6 +175,12 @@ class ChatViewsTests(TestCase):
             "How to Mine Diamonds",
         )
 
+    def test_recipe_question_is_rewritten_as_how_to_make(self):
+        self.assertEqual(
+            _make_session_title("What is the recipe of an iron pickaxe?"),
+            "How to Make an Iron Pickaxe",
+        )
+
     def test_long_how_to_question_keeps_core_topic(self):
         title = _make_session_title(
             "마인크래프트에서 다이아몬드를 가장 빠르게 찾는 방법을 자세히 설명해주세요"
