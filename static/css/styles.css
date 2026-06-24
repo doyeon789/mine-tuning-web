@@ -517,6 +517,12 @@ a {
     background: var(--color-arctic-mist);
 }
 
+.example-question-button:disabled,
+.message-edit-button:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
 .message-list {
     display: grid;
     gap: 20px;
@@ -568,6 +574,43 @@ a {
     border: 0;
     padding-left: 0;
     padding-right: 0;
+}
+
+.pending-message-list {
+    width: min(1080px, 100%);
+}
+
+.pending-message-list[hidden] {
+    display: none;
+}
+
+.pending-response-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-pewter);
+}
+
+.pending-response-dots {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pending-response-dots span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pending-response-pulse 1.2s ease-in-out infinite;
+}
+
+.pending-response-dots span:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.pending-response-dots span:nth-child(3) {
+    animation-delay: 0.3s;
 }
 
 .message-edit-form {
@@ -738,6 +781,56 @@ a {
     font-size: 18px;
     font-weight: 600;
     line-height: 1;
+}
+
+.send-button:disabled {
+    cursor: wait;
+    opacity: 0.75;
+}
+
+.send-button-loader {
+    display: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    border-top-color: var(--color-snow);
+    border-radius: 50%;
+    animation: send-button-spin 0.8s linear infinite;
+}
+
+.send-button.is-loading .send-button-icon {
+    display: none;
+}
+
+.send-button.is-loading .send-button-loader {
+    display: block;
+}
+
+@keyframes send-button-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pending-response-pulse {
+    0%,
+    60%,
+    100% {
+        opacity: 0.35;
+        transform: translateY(0);
+    }
+
+    30% {
+        opacity: 1;
+        transform: translateY(-3px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .send-button-loader,
+    .pending-response-dots span {
+        animation: none;
+    }
 }
 
 @media (max-width: 760px) {
