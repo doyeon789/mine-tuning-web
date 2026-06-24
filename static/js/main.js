@@ -210,6 +210,29 @@
         }
     };
 
+    const finishMessageEdit = (form, submittedContent) => {
+        if (!form.matches("[data-message-form]")) {
+            return;
+        }
+
+        const message = form.closest(".message");
+        const text = form.querySelector("[data-message-text]");
+        const textarea = form.querySelector("textarea");
+        const editButton = form.querySelector("[data-edit-message]");
+        const saveButton = form.querySelector(".message-edit-button");
+        const cancelButton = form.querySelector("[data-cancel-edit]");
+
+        message.classList.remove("editing");
+        message.style.width = "";
+        text.textContent = submittedContent;
+        text.hidden = false;
+        textarea.hidden = true;
+        saveButton.hidden = true;
+        cancelButton.hidden = true;
+        editButton.hidden = false;
+        editButton.disabled = true;
+    };
+
     document.querySelectorAll("[data-chat-submit-form]").forEach((form) => {
         form.addEventListener("submit", (event) => {
             if (isChatResponsePending || form.dataset.submitting === "true") {
@@ -262,6 +285,7 @@
                 }
             }
 
+            finishMessageEdit(form, submittedContent);
             removeMessagesAfter(form);
 
             const firstChat = document.querySelector("[data-first-chat]");
