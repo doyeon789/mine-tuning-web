@@ -163,6 +163,17 @@ a {
     font-weight: 600;
     font-size: 17px;
     line-height: 1;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+.history-item:hover .history-menu-button,
+.history-item:focus-within .history-menu-button {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
 }
 
 .history-menu-button:hover {
