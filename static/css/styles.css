@@ -473,6 +473,8 @@ a {
 
 .message-list {
     display: grid;
+    align-content: start;
+    grid-auto-rows: max-content;
     gap: 20px;
     width: min(1080px, 100%);
     min-width: 0;
