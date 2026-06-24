@@ -156,7 +156,7 @@ a {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 28px 32px;
     align-items: center;
-    border-radius: 10px;
+    border-radius: 6px;
 }
 
 .history-item:hover,
@@ -174,7 +174,7 @@ a {
     align-items: center;
     min-width: 0;
     color: var(--color-carbon);
-    padding: 6px 8px;
+    padding: 8px 9px;
     font-size: 14px;
     line-height: 1.43;
     overflow: hidden;
