@@ -110,8 +110,9 @@
                 </div>
             </form>
         {% else %}
-            <section class="first-chat">
-                <h2>Where should we begin?</h2>
+            <section class="first-chat" data-first-chat>
+                <h2 data-first-chat-heading>Where should we begin?</h2>
+                <div class="message-list pending-message-list" data-pending-response-host hidden></div>
                 <form class="composer first-chat-composer" action="{% url 'mine_chat:session_create' %}" method="post" data-chat-submit-form>
                     {% csrf_token %}
                     <div class="composer-inner">
@@ -122,8 +123,7 @@
                         </button>
                     </div>
                 </form>
-                <div class="message-list pending-message-list" data-pending-response-host hidden></div>
-                <div class="example-questions" aria-label="예시 질문">
+                <div class="example-questions" aria-label="예시 질문" data-example-questions>
                     <form action="{% url 'mine_chat:session_create' %}" method="post" data-chat-submit-form>
                         {% csrf_token %}
                         <input type="hidden" name="content" value="다이아 캐는법">

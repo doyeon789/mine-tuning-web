@@ -1,4 +1,5 @@
 ﻿document.addEventListener("DOMContentLoaded", () => {
+    const pendingDraftStorageKey = "mine-chat-pending-draft";
     const messageScroll = document.querySelector("[data-message-scroll]");
     if (messageScroll) {
         messageScroll.scrollTop = messageScroll.scrollHeight;
@@ -133,12 +134,41 @@
                 form.requestSubmit();
             }
         });
+
+        textarea.addEventListener("input", () => {
+            if (textarea.dataset.preserveDraft !== "true") {
+                return;
+            }
+
+            if (textarea.value) {
+                sessionStorage.setItem(pendingDraftStorageKey, textarea.value);
+            } else {
+                sessionStorage.removeItem(pendingDraftStorageKey);
+            }
+        });
     });
 
-    const showPendingResponse = () => {
+    const showPendingResponse = (content, showUserMessage) => {
         const host = document.querySelector("[data-pending-response-host]");
         if (!host || host.querySelector("[data-pending-response]")) {
             return;
+        }
+
+        const emptyState = host.querySelector(".empty-state");
+        if (emptyState) {
+            emptyState.remove();
+        }
+
+        if (showUserMessage) {
+            const pendingUserMessage = document.createElement("article");
+            const pendingUserContent = document.createElement("div");
+
+            pendingUserMessage.className = "message user pending-user-message";
+            pendingUserMessage.dataset.pendingUserMessage = "";
+            pendingUserContent.className = "message-content";
+            pendingUserContent.textContent = content;
+            pendingUserMessage.appendChild(pendingUserContent);
+            host.appendChild(pendingUserMessage);
         }
 
         const pendingResponse = document.createElement("article");
@@ -177,6 +207,8 @@
                 return;
             }
 
+            const submittedContent = contentInput.value.trim();
+
             form.dataset.submitting = "true";
             form.setAttribute("aria-busy", "true");
 
@@ -186,8 +218,27 @@
                 });
             });
 
-            if (contentInput instanceof HTMLTextAreaElement) {
+            if (contentInput.classList.contains("message-input")) {
+                const submittedContentInput = document.createElement("input");
+                submittedContentInput.type = "hidden";
+                submittedContentInput.name = "content";
+                submittedContentInput.value = contentInput.value;
+                form.appendChild(submittedContentInput);
+
+                contentInput.removeAttribute("name");
+                contentInput.required = false;
+                contentInput.value = "";
+                contentInput.dataset.preserveDraft = "true";
+                sessionStorage.removeItem(pendingDraftStorageKey);
+            } else if (contentInput instanceof HTMLTextAreaElement) {
                 contentInput.readOnly = true;
+            }
+
+            const firstChat = document.querySelector("[data-first-chat]");
+            if (firstChat) {
+                firstChat.classList.add("is-submitting");
+                document.querySelector("[data-first-chat-heading]")?.setAttribute("hidden", "");
+                document.querySelector("[data-example-questions]")?.setAttribute("hidden", "");
             }
 
             const submitButton = form.querySelector("button[type='submit']");
@@ -200,12 +251,21 @@
                 submitButton.setAttribute("aria-label", "답변 생성 중");
             }
 
-            showPendingResponse();
+            showPendingResponse(
+                submittedContent,
+                !form.matches("[data-message-form]")
+            );
         });
     });
 
     const messageInput = document.querySelector(".message-input");
     if (messageInput) {
+        const pendingDraft = sessionStorage.getItem(pendingDraftStorageKey);
+        if (pendingDraft !== null) {
+            messageInput.value = pendingDraft;
+            sessionStorage.removeItem(pendingDraftStorageKey);
+        }
+
         messageInput.focus();
         messageInput.setSelectionRange(messageInput.value.length, messageInput.value.length);
 

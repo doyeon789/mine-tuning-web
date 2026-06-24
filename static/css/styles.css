@@ -51,7 +51,8 @@ a {
   display: grid;
   grid-template-columns: 280px minmax(0, 1fr);
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   margin: 0;
   color: var(--color-carbon);
   background: var(--color-snow);
@@ -63,7 +64,8 @@ a {
 .sidebar {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 0;
+  height: 100vh;
   background: var(--color-fog);
   padding: 16px 10px 12px;
 }
@@ -521,8 +523,9 @@ a {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  min-height: 100vh;
-  overflow-x: hidden;
+  min-height: 0;
+  height: 100vh;
+  overflow: hidden;
   background: var(--color-snow);
 }
 
@@ -570,9 +573,10 @@ a {
 
 .messages {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 20px 24px 127px;
+  padding: 20px 24px;
 }
 
 .empty-state {
@@ -603,6 +607,25 @@ a {
   justify-items: center;
   gap: 24px;
   padding: 40px 40px 127px;
+}
+
+.first-chat.is-submitting {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    min-height: 0;
+    padding: 0;
+}
+
+.first-chat.is-submitting .first-chat-composer {
+    width: 100%;
+    padding: 20px 24px;
+}
+
+[data-first-chat-heading][hidden],
+[data-example-questions][hidden] {
+    display: none;
 }
 
 .example-questions {
@@ -637,11 +660,13 @@ a {
 }
 
 .message-list {
-  display: grid;
-  gap: 20px;
-  width: min(1080px, 100%);
-  min-width: 0;
-  margin: 0 auto;
+    display: grid;
+    align-content: start;
+    grid-auto-rows: max-content;
+    gap: 20px;
+    width: min(1080px, 100%);
+    min-width: 0;
+    margin: 0 auto;
 }
 
 .message {
@@ -691,6 +716,14 @@ a {
 
 .pending-message-list {
     width: min(1080px, 100%);
+}
+
+.first-chat.is-submitting .pending-message-list {
+    flex: 1;
+    width: min(1080px, 100%);
+    min-height: 0;
+    overflow-y: auto;
+    padding: 20px 24px 127px;
 }
 
 .pending-message-list[hidden] {
@@ -831,8 +864,8 @@ a {
 }
 
 .composer {
-  position: sticky;
-  bottom: 0;
+  position: relative;
+  flex-shrink: 0;
   border-top: 0;
   background: var(--color-snow);
   padding: 20px 24px;
@@ -949,13 +982,19 @@ a {
 @media (max-width: 760px) {
   .app-shell {
     grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
     width: 100%;
   }
 
   .sidebar {
     min-height: auto;
+    height: auto;
     border-right: 0;
     border-bottom: 1px solid var(--color-arctic-mist);
+  }
+
+  .chat-main {
+    height: auto;
   }
 
   .history-section,
