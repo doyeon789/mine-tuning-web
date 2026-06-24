@@ -15,20 +15,21 @@
     const closeHistoryMenus = () => {
         document.querySelectorAll("[data-history-menu]").forEach((menu) => {
             menu.hidden = true;
-            const renameForm = menu.querySelector("[data-history-rename-form]");
+            const item = menu.closest("[data-history-item]");
+            const titleTextarea = item.querySelector("[data-history-title-textarea]");
             const renameButton = menu.querySelector("[data-history-rename-button]");
 
-            if (renameForm) {
-                renameForm.hidden = true;
-                const input = renameForm.querySelector("input");
-                if (input) {
-                    input.value = input.defaultValue;
-                }
+            if (titleTextarea) {
+                titleTextarea.readOnly = true;
+                titleTextarea.value = titleTextarea.defaultValue;
             }
 
             if (renameButton) {
                 renameButton.hidden = false;
             }
+        });
+        document.querySelectorAll("[data-history-menu-button]").forEach((button) => {
+            button.setAttribute("aria-expanded", "false");
         });
     };
     
@@ -41,34 +42,45 @@
 
             closeHistoryMenus();
             menu.hidden = !shouldOpen;
+            button.setAttribute("aria-expanded", String(shouldOpen));
         });
     });
 
     document.querySelectorAll("[data-history-rename-button]").forEach((button) => {
         button.addEventListener("click", (event) => {
             event.stopPropagation();
-            const menu = button.closest("[data-history-menu]");
-            const form = menu.querySelector("[data-history-rename-form]");
-            const input = form.querySelector("input");
+            const item = button.closest("[data-history-item]");
+            const titleTextarea = item.querySelector("[data-history-title-textarea]");
 
+            closeHistoryMenus();
             button.hidden = true;
-            form.hidden = false;
-            input.focus();
-            input.select();
+            titleTextarea.readOnly = false;
+            titleTextarea.focus();
+            titleTextarea.select();
         });
     });
 
-    document.querySelectorAll("[data-history-rename-cancel]").forEach((button) => {
-        button.addEventListener("click", (event) => {
-            event.stopPropagation();
-            const form = button.closest("[data-history-rename-form]");
-            const menu = form.closest("[data-history-menu]");
-            const renameButton = menu.querySelector("[data-history-rename-button]");
-            const input = form.querySelector("input");
+    document.querySelectorAll("[data-history-title-form]").forEach((form) => {
+        const titleTextarea = form.querySelector("[data-history-title-textarea]");
 
-            input.value = input.defaultValue;
-            form.hidden = true;
-            renameButton.hidden = false;
+        titleTextarea.addEventListener("click", () => {
+            if (titleTextarea.readOnly) {
+                window.location.href = form.dataset.sessionUrl;
+            }
+        });
+
+        titleTextarea.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                event.preventDefault();
+                titleTextarea.value = titleTextarea.defaultValue;
+                closeHistoryMenus();
+                return;
+            }
+
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                form.requestSubmit();
+            }
         });
     });
 
