@@ -194,6 +194,16 @@ def _make_session_title(content):
         else:
             title = f"How to Use {subject_with_article}"
 
+    else:
+        generic_how_match = re.fullmatch(
+            r"(?:how\s+(?:do|can|should)\s+i|how\s+to)\s+(.+)",
+            title,
+            flags=re.IGNORECASE,
+        )
+        if generic_how_match:
+            action_phrase = generic_how_match.group(1).strip().title()
+            title = f"How to {action_phrase}"
+
     if title.casefold() in {"hi", "hello", "ㅎㅇ", "안녕", "안녕하세요"}:
         return DEFAULT_SESSION_TITLE
 
