@@ -285,6 +285,61 @@ class ChatViewsTests(TestCase):
         session.refresh_from_db()
         self.assertFalse(session.is_pinned)
 
+    def test_ajax_session_update_returns_chat_app_html(self):
+        session = ChatSession.objects.create(owner=self.user, title="Before")
+
+        response = self.client.post(
+            reverse("mine_chat:session_update", args=[session.pk]),
+            {"title": "After"},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn('data-chat-app data-active-session-id="', data["app_html"])
+        self.assertIn("After", data["app_html"])
+        self.assertEqual(
+            data["url"],
+            reverse("mine_chat:session_detail", args=[session.pk]),
+        )
+        session.refresh_from_db()
+        self.assertEqual(session.title, "After")
+
+    def test_ajax_session_pin_returns_reordered_chat_app_html(self):
+        session = ChatSession.objects.create(owner=self.user, title="Test chat")
+
+        response = self.client.post(
+            reverse("mine_chat:session_pin", args=[session.pk]),
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("즐겨찾기 해제", data["app_html"])
+        self.assertIn("pinned-history", data["app_html"])
+        session.refresh_from_db()
+        self.assertTrue(session.is_pinned)
+
+    def test_ajax_session_delete_preserves_current_active_session(self):
+        active_session = ChatSession.objects.create(owner=self.user, title="Active")
+        other_session = ChatSession.objects.create(owner=self.user, title="Other")
+
+        response = self.client.post(
+            reverse("mine_chat:session_delete", args=[other_session.pk]),
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            HTTP_X_ACTIVE_SESSION=str(active_session.pk),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("Active", data["app_html"])
+        self.assertNotIn("Other", data["app_html"])
+        self.assertEqual(
+            data["url"],
+            reverse("mine_chat:session_detail", args=[active_session.pk]),
+        )
+        self.assertFalse(ChatSession.objects.filter(pk=other_session.pk).exists())
+
     def test_update_user_message_removes_later_messages_and_recreates_response(self):
         session = ChatSession.objects.create(owner=self.user, title="Test chat")
         user_message = ChatMessage.objects.create(
