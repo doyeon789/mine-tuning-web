@@ -197,20 +197,21 @@ a {
 }
 
 .history-favorite-button .history-pin-icon {
-  width: 18px;
-  height: 18px;
-  flex-basis: 18px;
+  width: 15px;
+  height: 15px;
+  flex-basis: 15px;
 }
 
-.regular-history .history-favorite-button {
-  width: 22px;
-  height: 22px;
+.regular-history .flex-basis {
+  width: 15px;
+  height: 15px;
+  flex-basis: 15px;
 }
 
 .regular-history .history-favorite-button .history-pin-icon {
-  width: 14px;
-  height: 14px;
-  flex-basis: 14px;
+  width: 15px;
+  height: 15px;
+  flex-basis: 15px;
 }
 
 .history-favorite-button.favorited {
@@ -220,6 +221,8 @@ a {
 .history-favorite-button.favorited .history-pin-icon {
   fill: currentColor;
   stroke: none;
+  width: 18px;
+  height: 18px;
 }
 
 .history-item:hover .history-favorite-button,
