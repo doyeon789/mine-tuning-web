@@ -421,6 +421,20 @@ a {
     padding: 40px 40px 127px;
 }
 
+.first-chat.is-submitting {
+    align-content: start;
+    justify-items: stretch;
+}
+
+.first-chat.is-submitting .first-chat-composer {
+    width: 100%;
+}
+
+[data-first-chat-heading][hidden],
+[data-example-questions][hidden] {
+    display: none;
+}
+
 .example-questions {
     display: flex;
     flex-wrap: wrap;
@@ -507,6 +521,11 @@ a {
 
 .pending-message-list {
     width: min(1080px, 100%);
+}
+
+.first-chat.is-submitting .pending-message-list {
+    min-height: 160px;
+    padding-top: 24px;
 }
 
 .pending-message-list[hidden] {

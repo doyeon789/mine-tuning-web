@@ -86,10 +86,27 @@
         });
     });
 
-    const showPendingResponse = () => {
+    const showPendingResponse = (content, showUserMessage) => {
         const host = document.querySelector("[data-pending-response-host]");
         if (!host || host.querySelector("[data-pending-response]")) {
             return;
+        }
+
+        const emptyState = host.querySelector(".empty-state");
+        if (emptyState) {
+            emptyState.remove();
+        }
+
+        if (showUserMessage) {
+            const pendingUserMessage = document.createElement("article");
+            const pendingUserContent = document.createElement("div");
+
+            pendingUserMessage.className = "message user pending-user-message";
+            pendingUserMessage.dataset.pendingUserMessage = "";
+            pendingUserContent.className = "message-content";
+            pendingUserContent.textContent = content;
+            pendingUserMessage.appendChild(pendingUserContent);
+            host.appendChild(pendingUserMessage);
         }
 
         const pendingResponse = document.createElement("article");
@@ -141,6 +158,13 @@
                 contentInput.readOnly = true;
             }
 
+            const firstChat = document.querySelector("[data-first-chat]");
+            if (firstChat) {
+                firstChat.classList.add("is-submitting");
+                document.querySelector("[data-first-chat-heading]")?.setAttribute("hidden", "");
+                document.querySelector("[data-example-questions]")?.setAttribute("hidden", "");
+            }
+
             const submitButton = form.querySelector("button[type='submit']");
             if (submitButton?.classList.contains("send-button")) {
                 submitButton.classList.add("is-loading");
@@ -151,7 +175,10 @@
                 submitButton.setAttribute("aria-label", "답변 생성 중");
             }
 
-            showPendingResponse();
+            showPendingResponse(
+                contentInput.value.trim(),
+                !form.matches("[data-message-form]")
+            );
         });
     });
 

@@ -26,6 +26,8 @@ class ChatViewsTests(TestCase):
         self.assertContains(response, "Where should we begin?")
         self.assertContains(response, "data-chat-submit-form")
         self.assertContains(response, "data-pending-response-host")
+        self.assertContains(response, "data-first-chat")
+        self.assertContains(response, "data-example-questions")
         self.assertEqual(ChatSession.objects.count(), 1)
         self.assertNotContains(response, '<div class="chat-topbar">', html=False)
 
