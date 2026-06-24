@@ -243,7 +243,6 @@ document.addEventListener("DOMContentLoaded", () => {
             form.dataset.submitting = "false";
             form.removeAttribute("aria-busy");
             alert(error.message || "채팅 요청에 실패했습니다.");
-            window.location.reload();
         }
     };
 
