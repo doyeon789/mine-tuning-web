@@ -1,17 +1,5 @@
-﻿document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
     const pendingDraftStorageKey = "mine-chat-pending-draft";
-    const messageScroll = document.querySelector("[data-message-scroll]");
-    if (messageScroll) {
-        messageScroll.scrollTop = messageScroll.scrollHeight;
-    }
-
-    document.querySelectorAll("[data-confirm]").forEach((form) => {
-        form.addEventListener("submit", (event) => {
-            if (!window.confirm(form.dataset.confirm)) {
-                event.preventDefault();
-            }
-        });
-    });
 
     const closeHistoryMenus = () => {
         document.querySelectorAll("[data-history-menu]").forEach((menu) => {
@@ -33,63 +21,6 @@
             button.setAttribute("aria-expanded", "false");
         });
     };
-    
-    document.querySelectorAll("[data-history-menu-button]").forEach((button) => {
-        button.addEventListener("click", (event) => {
-            event.stopPropagation();
-            const item = button.closest("[data-history-item]");
-            const menu = item.querySelector("[data-history-menu]");
-            const shouldOpen = menu.hidden;
-
-            closeHistoryMenus();
-            menu.hidden = !shouldOpen;
-            button.setAttribute("aria-expanded", String(shouldOpen));
-        });
-    });
-
-    document.querySelectorAll("[data-history-rename-button]").forEach((button) => {
-        button.addEventListener("click", (event) => {
-            event.stopPropagation();
-            const item = button.closest("[data-history-item]");
-            const titleTextarea = item.querySelector("[data-history-title-textarea]");
-
-            closeHistoryMenus();
-            button.hidden = true;
-            titleTextarea.readOnly = false;
-            titleTextarea.focus();
-            titleTextarea.select();
-        });
-    });
-
-    document.querySelectorAll("[data-history-title-form]").forEach((form) => {
-        const titleTextarea = form.querySelector("[data-history-title-textarea]");
-
-        titleTextarea.addEventListener("click", () => {
-            if (titleTextarea.readOnly) {
-                window.location.href = form.dataset.sessionUrl;
-            }
-        });
-
-        titleTextarea.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") {
-                event.preventDefault();
-                titleTextarea.value = titleTextarea.defaultValue;
-                closeHistoryMenus();
-                return;
-            }
-
-            if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                form.requestSubmit();
-            }
-        });
-    });
-
-    document.addEventListener("click", (event) => {
-        if (!event.target.closest("[data-history-item]")) {
-            closeHistoryMenus();
-        }
-    });
 
     const closeAccountMenu = () => {
         const menu = document.querySelector("[data-account-menu]");
@@ -103,50 +34,77 @@
         button.setAttribute("aria-expanded", "false");
     };
 
-    const accountMenuButton = document.querySelector("[data-account-menu-button]");
-    if (accountMenuButton) {
-        accountMenuButton.addEventListener("click", (event) => {
-            event.stopPropagation();
-            const menu = document.querySelector("[data-account-menu]");
-            const isOpen = !menu.hidden;
-
-            closeHistoryMenus();
-            menu.hidden = isOpen;
-            accountMenuButton.setAttribute("aria-expanded", String(!isOpen));
-        });
-    }
-
-    document.addEventListener("click", (event) => {
-        if (!event.target.closest("[data-account-menu-wrap]")) {
-            closeAccountMenu();
+    const replaceChatApp = (html, url) => {
+        const currentApp = document.querySelector("[data-chat-app]");
+        if (!currentApp) {
+            return;
         }
-    });
 
-    document.querySelectorAll(".message-input").forEach((textarea) => {
-        textarea.addEventListener("keydown", (event) => {
-            if (event.key !== "Enter" || event.shiftKey || event.isComposing) {
+        const template = document.createElement("template");
+        template.innerHTML = html.trim();
+        const nextApp = template.content.querySelector("[data-chat-app]");
+
+        if (!nextApp) {
+            return;
+        }
+
+        currentApp.replaceWith(nextApp);
+        if (url) {
+            window.history.replaceState({}, "", url);
+        }
+        initializeChatApp(nextApp);
+    };
+
+    const submitHistoryForm = async (form) => {
+        if (form.dataset.submitting === "true") {
+            return;
+        }
+
+        if (form.dataset.confirm && !window.confirm(form.dataset.confirm)) {
+            return;
+        }
+
+        form.dataset.submitting = "true";
+        form.setAttribute("aria-busy", "true");
+        form.querySelectorAll("button[type='submit']").forEach((button) => {
+            button.disabled = true;
+        });
+
+        try {
+            const app = form.closest("[data-chat-app]");
+            const headers = {
+                "X-Requested-With": "XMLHttpRequest",
+            };
+
+            if (app?.dataset.activeSessionId) {
+                headers["X-Active-Session"] = app.dataset.activeSessionId;
+            }
+
+            const response = await fetch(form.action, {
+                method: form.method || "POST",
+                body: new FormData(form),
+                headers,
+            });
+            const data = await response.json();
+
+            if (data.app_html) {
+                replaceChatApp(data.app_html, data.url);
                 return;
             }
 
-            event.preventDefault();
-            const form = textarea.closest("form");
-            if (form && textarea.value.trim()) {
-                form.requestSubmit();
+            if (!response.ok) {
+                throw new Error(data.error || "요청을 처리하지 못했습니다.");
             }
-        });
-
-        textarea.addEventListener("input", () => {
-            if (textarea.dataset.preserveDraft !== "true") {
-                return;
-            }
-
-            if (textarea.value) {
-                sessionStorage.setItem(pendingDraftStorageKey, textarea.value);
-            } else {
-                sessionStorage.removeItem(pendingDraftStorageKey);
-            }
-        });
-    });
+        } catch (error) {
+            form.submit();
+        } finally {
+            form.dataset.submitting = "false";
+            form.removeAttribute("aria-busy");
+            form.querySelectorAll("button[type='submit']").forEach((button) => {
+                button.disabled = false;
+            });
+        }
+    };
 
     const showPendingResponse = (content, showUserMessage) => {
         const host = document.querySelector("[data-pending-response-host]");
@@ -194,152 +152,278 @@
         }
     };
 
-    document.querySelectorAll("[data-chat-submit-form]").forEach((form) => {
-        form.addEventListener("submit", (event) => {
-            if (form.dataset.submitting === "true") {
-                event.preventDefault();
-                return;
-            }
-
-            const contentInput = form.querySelector("[name='content']");
-            if (!contentInput || !contentInput.value.trim()) {
-                event.preventDefault();
-                return;
-            }
-
-            const submittedContent = contentInput.value.trim();
-
-            form.dataset.submitting = "true";
-            form.setAttribute("aria-busy", "true");
-
-            document.querySelectorAll("[data-chat-submit-form]").forEach((chatForm) => {
-                chatForm.querySelectorAll("button[type='submit']").forEach((button) => {
-                    button.disabled = true;
-                });
-            });
-
-            if (contentInput.classList.contains("message-input")) {
-                const submittedContentInput = document.createElement("input");
-                submittedContentInput.type = "hidden";
-                submittedContentInput.name = "content";
-                submittedContentInput.value = contentInput.value;
-                form.appendChild(submittedContentInput);
-
-                contentInput.removeAttribute("name");
-                contentInput.required = false;
-                contentInput.value = "";
-                contentInput.dataset.preserveDraft = "true";
-                sessionStorage.removeItem(pendingDraftStorageKey);
-            } else if (contentInput instanceof HTMLTextAreaElement) {
-                contentInput.readOnly = true;
-            }
-
-            const firstChat = document.querySelector("[data-first-chat]");
-            if (firstChat) {
-                firstChat.classList.add("is-submitting");
-                document.querySelector("[data-first-chat-heading]")?.setAttribute("hidden", "");
-                document.querySelector("[data-example-questions]")?.setAttribute("hidden", "");
-            }
-
-            const submitButton = form.querySelector("button[type='submit']");
-            if (submitButton?.classList.contains("send-button")) {
-                submitButton.classList.add("is-loading");
-                submitButton.setAttribute("aria-label", "답변 생성 중");
-            } else if (submitButton) {
-                submitButton.classList.add("is-loading");
-                submitButton.textContent = "생성 중...";
-                submitButton.setAttribute("aria-label", "답변 생성 중");
-            }
-
-            showPendingResponse(
-                submittedContent,
-                !form.matches("[data-message-form]")
-            );
-        });
-    });
-
-    const messageInput = document.querySelector(".message-input");
-    if (messageInput) {
-        const pendingDraft = sessionStorage.getItem(pendingDraftStorageKey);
-        if (pendingDraft !== null) {
-            messageInput.value = pendingDraft;
-            sessionStorage.removeItem(pendingDraftStorageKey);
-        }
-
-        messageInput.focus();
-        messageInput.setSelectionRange(messageInput.value.length, messageInput.value.length);
-
-        document.addEventListener("keydown", (event) => {
-            const target = event.target;
-            const isEditableTarget =
-                target instanceof HTMLInputElement ||
-                target instanceof HTMLTextAreaElement ||
-                target instanceof HTMLSelectElement ||
-                target.isContentEditable;
-
-            if (
-                isEditableTarget ||
-                event.ctrlKey ||
-                event.metaKey ||
-                event.altKey ||
-                event.key.length !== 1
-            ) {
-                return;
-            }
-
-            messageInput.focus();
-            messageInput.setSelectionRange(messageInput.value.length, messageInput.value.length);
-        });
-    }
-
     const resizeMessageEditInput = (textarea) => {
         textarea.style.height = "auto";
         textarea.style.height = `${textarea.scrollHeight}px`;
     };
 
-    document.querySelectorAll("[data-edit-message]").forEach((button) => {
-        button.addEventListener("click", () => {
-            const form = button.closest("[data-message-form]");
-            const message = form.closest(".message");
-            const text = form.querySelector("[data-message-text]");
-            const textarea = form.querySelector("textarea");
-            const saveButton = form.querySelector(".message-edit-button");
-            const cancelButton = form.querySelector(".message-cancel-button");
+    const initializeChatApp = (root = document) => {
+        const messageScroll = root.querySelector("[data-message-scroll]");
+        if (messageScroll) {
+            messageScroll.scrollTop = messageScroll.scrollHeight;
+        }
 
-            message.classList.add("editing");
-            text.hidden = true;
-            textarea.hidden = false;
-            resizeMessageEditInput(textarea);
-            button.hidden = true;
-            saveButton.hidden = false;
-            cancelButton.hidden = false;
-            textarea.focus();
-            textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+        root.querySelectorAll("[data-confirm]:not([data-history-ajax-form])").forEach((form) => {
+            form.addEventListener("submit", (event) => {
+                if (!window.confirm(form.dataset.confirm)) {
+                    event.preventDefault();
+                }
+            });
         });
-    });
 
-    document.querySelectorAll("[data-cancel-edit]").forEach((button) => {
-        button.addEventListener("click", () => {
-            const form = button.closest("[data-message-form]");
-            const message = form.closest(".message");
-            const text = form.querySelector("[data-message-text]");
-            const textarea = form.querySelector("textarea");
-            const editButton = form.querySelector(".message-action-button");
-            const saveButton = form.querySelector(".message-edit-button");
+        root.querySelectorAll("[data-history-menu-button]").forEach((button) => {
+            button.addEventListener("click", (event) => {
+                event.stopPropagation();
+                const item = button.closest("[data-history-item]");
+                const menu = item.querySelector("[data-history-menu]");
+                const shouldOpen = menu.hidden;
 
-            message.classList.remove("editing");
-            message.style.width = "";
-            textarea.value = textarea.defaultValue;
-            textarea.style.height = "";
-            textarea.hidden = true;
-            text.hidden = false;
-            saveButton.hidden = true;
-            button.hidden = true;
-            editButton.hidden = false;
+                closeHistoryMenus();
+                menu.hidden = !shouldOpen;
+                button.setAttribute("aria-expanded", String(shouldOpen));
+            });
         });
+
+        root.querySelectorAll("[data-history-rename-button]").forEach((button) => {
+            button.addEventListener("click", (event) => {
+                event.stopPropagation();
+                const item = button.closest("[data-history-item]");
+                const titleTextarea = item.querySelector("[data-history-title-textarea]");
+
+                closeHistoryMenus();
+                button.hidden = true;
+                titleTextarea.readOnly = false;
+                titleTextarea.focus();
+                titleTextarea.select();
+            });
+        });
+
+        root.querySelectorAll("[data-history-title-form]").forEach((form) => {
+            const titleTextarea = form.querySelector("[data-history-title-textarea]");
+
+            titleTextarea.addEventListener("click", () => {
+                if (titleTextarea.readOnly) {
+                    window.location.href = form.dataset.sessionUrl;
+                }
+            });
+
+            titleTextarea.addEventListener("keydown", (event) => {
+                if (event.key === "Escape") {
+                    event.preventDefault();
+                    titleTextarea.value = titleTextarea.defaultValue;
+                    closeHistoryMenus();
+                    return;
+                }
+
+                if (event.key === "Enter" && !event.shiftKey) {
+                    event.preventDefault();
+                    form.requestSubmit();
+                }
+            });
+        });
+
+        root.querySelectorAll("[data-history-ajax-form]").forEach((form) => {
+            form.addEventListener("submit", (event) => {
+                event.preventDefault();
+                submitHistoryForm(form);
+            });
+        });
+
+        const accountMenuButton = root.querySelector("[data-account-menu-button]");
+        if (accountMenuButton) {
+            accountMenuButton.addEventListener("click", (event) => {
+                event.stopPropagation();
+                const menu = document.querySelector("[data-account-menu]");
+                const isOpen = !menu.hidden;
+
+                closeHistoryMenus();
+                menu.hidden = isOpen;
+                accountMenuButton.setAttribute("aria-expanded", String(!isOpen));
+            });
+        }
+
+        root.querySelectorAll(".message-input").forEach((textarea) => {
+            textarea.addEventListener("keydown", (event) => {
+                if (event.key !== "Enter" || event.shiftKey || event.isComposing) {
+                    return;
+                }
+
+                event.preventDefault();
+                const form = textarea.closest("form");
+                if (form && textarea.value.trim()) {
+                    form.requestSubmit();
+                }
+            });
+
+            textarea.addEventListener("input", () => {
+                if (textarea.dataset.preserveDraft !== "true") {
+                    return;
+                }
+
+                if (textarea.value) {
+                    sessionStorage.setItem(pendingDraftStorageKey, textarea.value);
+                } else {
+                    sessionStorage.removeItem(pendingDraftStorageKey);
+                }
+            });
+        });
+
+        root.querySelectorAll("[data-chat-submit-form]").forEach((form) => {
+            form.addEventListener("submit", (event) => {
+                if (form.dataset.submitting === "true") {
+                    event.preventDefault();
+                    return;
+                }
+
+                const contentInput = form.querySelector("[name='content']");
+                if (!contentInput || !contentInput.value.trim()) {
+                    event.preventDefault();
+                    return;
+                }
+
+                const submittedContent = contentInput.value.trim();
+
+                form.dataset.submitting = "true";
+                form.setAttribute("aria-busy", "true");
+
+                document.querySelectorAll("[data-chat-submit-form]").forEach((chatForm) => {
+                    chatForm.querySelectorAll("button[type='submit']").forEach((button) => {
+                        button.disabled = true;
+                    });
+                });
+
+                if (contentInput.classList.contains("message-input")) {
+                    const submittedContentInput = document.createElement("input");
+                    submittedContentInput.type = "hidden";
+                    submittedContentInput.name = "content";
+                    submittedContentInput.value = contentInput.value;
+                    form.appendChild(submittedContentInput);
+
+                    contentInput.removeAttribute("name");
+                    contentInput.required = false;
+                    contentInput.value = "";
+                    contentInput.dataset.preserveDraft = "true";
+                    sessionStorage.removeItem(pendingDraftStorageKey);
+                } else if (contentInput instanceof HTMLTextAreaElement) {
+                    contentInput.readOnly = true;
+                }
+
+                const firstChat = document.querySelector("[data-first-chat]");
+                if (firstChat) {
+                    firstChat.classList.add("is-submitting");
+                    document.querySelector("[data-first-chat-heading]")?.setAttribute("hidden", "");
+                    document.querySelector("[data-example-questions]")?.setAttribute("hidden", "");
+                }
+
+                const submitButton = form.querySelector("button[type='submit']");
+                if (submitButton?.classList.contains("send-button")) {
+                    submitButton.classList.add("is-loading");
+                    submitButton.setAttribute("aria-label", "답변 생성 중");
+                } else if (submitButton) {
+                    submitButton.classList.add("is-loading");
+                    submitButton.textContent = "생성 중...";
+                    submitButton.setAttribute("aria-label", "답변 생성 중");
+                }
+
+                showPendingResponse(
+                    submittedContent,
+                    !form.matches("[data-message-form]")
+                );
+            });
+        });
+
+        const messageInput = root.querySelector(".message-input");
+        if (messageInput) {
+            const pendingDraft = sessionStorage.getItem(pendingDraftStorageKey);
+            if (pendingDraft !== null) {
+                messageInput.value = pendingDraft;
+                sessionStorage.removeItem(pendingDraftStorageKey);
+            }
+
+            messageInput.focus();
+            messageInput.setSelectionRange(messageInput.value.length, messageInput.value.length);
+        }
+
+        root.querySelectorAll("[data-edit-message]").forEach((button) => {
+            button.addEventListener("click", () => {
+                const form = button.closest("[data-message-form]");
+                const message = form.closest(".message");
+                const text = form.querySelector("[data-message-text]");
+                const textarea = form.querySelector("textarea");
+                const saveButton = form.querySelector(".message-edit-button");
+                const cancelButton = form.querySelector(".message-cancel-button");
+
+                message.classList.add("editing");
+                text.hidden = true;
+                textarea.hidden = false;
+                resizeMessageEditInput(textarea);
+                button.hidden = true;
+                saveButton.hidden = false;
+                cancelButton.hidden = false;
+                textarea.focus();
+                textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+            });
+        });
+
+        root.querySelectorAll("[data-cancel-edit]").forEach((button) => {
+            button.addEventListener("click", () => {
+                const form = button.closest("[data-message-form]");
+                const message = form.closest(".message");
+                const text = form.querySelector("[data-message-text]");
+                const textarea = form.querySelector("textarea");
+                const editButton = form.querySelector(".message-action-button");
+                const saveButton = form.querySelector(".message-edit-button");
+
+                message.classList.remove("editing");
+                message.style.width = "";
+                textarea.value = textarea.defaultValue;
+                textarea.style.height = "";
+                textarea.hidden = true;
+                text.hidden = false;
+                saveButton.hidden = true;
+                button.hidden = true;
+                editButton.hidden = false;
+            });
+        });
+
+        root.querySelectorAll(".message-edit-input").forEach((textarea) => {
+            textarea.addEventListener("input", () => resizeMessageEditInput(textarea));
+        });
+    };
+
+    document.addEventListener("click", (event) => {
+        if (!event.target.closest("[data-history-item]")) {
+            closeHistoryMenus();
+        }
+
+        if (!event.target.closest("[data-account-menu-wrap]")) {
+            closeAccountMenu();
+        }
     });
 
-    document.querySelectorAll(".message-edit-input").forEach((textarea) => {
-        textarea.addEventListener("input", () => resizeMessageEditInput(textarea));
+    document.addEventListener("keydown", (event) => {
+        const messageInput = document.querySelector(".message-input");
+        const target = event.target;
+        const isEditableTarget =
+            target instanceof HTMLInputElement ||
+            target instanceof HTMLTextAreaElement ||
+            target instanceof HTMLSelectElement ||
+            target.isContentEditable;
+
+        if (
+            !messageInput ||
+            isEditableTarget ||
+            event.ctrlKey ||
+            event.metaKey ||
+            event.altKey ||
+            event.key.length !== 1
+        ) {
+            return;
+        }
+
+        messageInput.focus();
+        messageInput.setSelectionRange(messageInput.value.length, messageInput.value.length);
     });
+
+    initializeChatApp();
 });
