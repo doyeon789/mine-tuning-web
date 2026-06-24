@@ -325,11 +325,11 @@ a {
 }
 
 .history-menu-action.pinned {
-    color: var(--color-pin-brown);
+    color: var(--color-carbon);
 }
 
 .history-menu-action.pinned .history-menu-icon {
-    fill: var(--color-pin-yellow);
+    fill: var(--color-carbon);
     stroke: none;
 }
 
