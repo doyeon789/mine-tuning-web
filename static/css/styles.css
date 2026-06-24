@@ -41,6 +41,8 @@ a {
   --color-pin-yellow: #f7c948;
   --color-pin-yellow-soft: #fff6cc;
   --color-pin-brown: #7a4f00;
+  --sidebar-hover-radius: 10px;
+  --sidebar-control-size: 32px;
   --font-ui-sans-serif:
     ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, "Noto Sans KR", sans-serif;
@@ -91,7 +93,7 @@ a {
   gap: 8px;
   width: 100%;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--sidebar-hover-radius);
   background: transparent;
   color: var(--color-carbon);
   padding: 6px 6px 6px 8px;
@@ -160,19 +162,19 @@ a {
 .history-item {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 28px 32px;
+  grid-template-columns: minmax(0, 1fr) var(--sidebar-control-size) var(--sidebar-control-size);
   align-items: center;
-  border-radius: 6px;
+  border-radius: var(--sidebar-hover-radius);
 }
 
 .history-item:hover,
 .history-item.active {
-  background: var(--color-history-hover);
+  background: var(--color-arctic-mist);
 }
 
 .history-item.pinned:hover,
 .history-item.pinned.active {
-  background: var(--color-history-hover);
+  background: var(--color-arctic-mist);
 }
 
 .history-favorite-form {
@@ -183,11 +185,11 @@ a {
 .history-favorite-button {
   display: grid;
   place-items: center;
-  width: 24px;
-  height: 24px;
+  width: var(--sidebar-control-size);
+  height: var(--sidebar-control-size);
   justify-self: end;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--sidebar-hover-radius);
   background: transparent;
   color: var(--color-stone);
   padding: 0;
@@ -240,10 +242,10 @@ a {
 .history-menu-button {
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  width: var(--sidebar-control-size);
+  height: var(--sidebar-control-size);
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--sidebar-hover-radius);
   background: transparent;
   color: var(--color-stone);
   opacity: 0;
@@ -412,7 +414,7 @@ a {
   display: block;
   margin: 16px 6px 0;
   border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 999px;
+  border-radius: var(--sidebar-hover-radius);
   background: var(--color-snow);
   color: var(--color-carbon);
   padding: 8px 16px;
@@ -460,11 +462,11 @@ a {
 
 .account-menu-button {
   display: grid;
-  width: 32px;
-  height: 32px;
+  width: var(--sidebar-control-size);
+  height: var(--sidebar-control-size);
   place-items: center;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--sidebar-hover-radius);
   background: transparent;
   padding: 7px 8px;
 }
