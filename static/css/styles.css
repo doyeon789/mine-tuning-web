@@ -281,29 +281,28 @@ a {
     display: none;
 }
 
-.history-rename-form {
-    display: grid;
-    gap: 8px;
-    margin: 4px 0;
-    padding: 8px;
-}
-
-.history-rename-form[hidden] {
+.history-inline-rename-form[hidden] {
     display: none;
 }
 
-.history-rename-input {
-    width: 100%;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    border-radius: 8px;
-    padding: 8px 10px;
-    font-size: 14px;
+.history-inline-rename-form {
+    min-width: 0;
+    padding: 2px 0 2px 4px;
 }
 
-.history-rename-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+.history-inline-rename-input {
+    width: 100%;
+    border: 0;
+    border-radius: 6px;
+    background: var(--color-snow);
+    color: var(--color-carbon);
+    padding: 4px 6px;
+    font-size: 14px;
+    line-height: 1.43;
+}
+
+.history-inline-rename-input:focus {
+    outline: 1px solid rgba(0, 0, 0, 0.18);
 }
 
 .history-menu-action {

@@ -15,7 +15,9 @@
     const closeHistoryMenus = () => {
         document.querySelectorAll("[data-history-menu]").forEach((menu) => {
             menu.hidden = true;
-            const renameForm = menu.querySelector("[data-history-rename-form]");
+            const item = menu.closest("[data-history-item]");
+            const renameForm = item.querySelector("[data-history-rename-form]");
+            const historyLink = item.querySelector("[data-history-link]");
             const renameButton = menu.querySelector("[data-history-rename-button]");
 
             if (renameForm) {
@@ -24,6 +26,10 @@
                 if (input) {
                     input.value = input.defaultValue;
                 }
+            }
+
+            if (historyLink) {
+                historyLink.hidden = false;
             }
 
             if (renameButton) {
@@ -52,9 +58,13 @@
         button.addEventListener("click", (event) => {
             event.stopPropagation();
             const menu = button.closest("[data-history-menu]");
-            const form = menu.querySelector("[data-history-rename-form]");
+            const item = button.closest("[data-history-item]");
+            const form = item.querySelector("[data-history-rename-form]");
+            const historyLink = item.querySelector("[data-history-link]");
             const input = form.querySelector("input");
 
+            closeHistoryMenus();
+            historyLink.hidden = true;
             button.hidden = true;
             form.hidden = false;
             input.focus();
@@ -62,17 +72,15 @@
         });
     });
 
-    document.querySelectorAll("[data-history-rename-cancel]").forEach((button) => {
-        button.addEventListener("click", (event) => {
-            event.stopPropagation();
-            const form = button.closest("[data-history-rename-form]");
-            const menu = form.closest("[data-history-menu]");
-            const renameButton = menu.querySelector("[data-history-rename-button]");
-            const input = form.querySelector("input");
+    document.querySelectorAll("[data-history-rename-form]").forEach((form) => {
+        const input = form.querySelector("input");
 
-            input.value = input.defaultValue;
-            form.hidden = true;
-            renameButton.hidden = false;
+        input.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                event.preventDefault();
+                input.value = input.defaultValue;
+                closeHistoryMenus();
+            }
         });
     });
 
