@@ -166,7 +166,6 @@
                 contentInput.removeAttribute("name");
                 contentInput.required = false;
                 contentInput.value = "";
-                contentInput.readOnly = true;
             } else if (contentInput instanceof HTMLTextAreaElement) {
                 contentInput.readOnly = true;
             }
