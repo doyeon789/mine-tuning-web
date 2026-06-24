@@ -1,4 +1,5 @@
 ﻿document.addEventListener("DOMContentLoaded", () => {
+    const pendingDraftStorageKey = "mine-chat-pending-draft";
     const messageScroll = document.querySelector("[data-message-scroll]");
     if (messageScroll) {
         messageScroll.scrollTop = messageScroll.scrollHeight;
@@ -84,6 +85,18 @@
                 form.requestSubmit();
             }
         });
+
+        textarea.addEventListener("input", () => {
+            if (textarea.dataset.preserveDraft !== "true") {
+                return;
+            }
+
+            if (textarea.value) {
+                sessionStorage.setItem(pendingDraftStorageKey, textarea.value);
+            } else {
+                sessionStorage.removeItem(pendingDraftStorageKey);
+            }
+        });
     });
 
     const showPendingResponse = (content, showUserMessage) => {
@@ -166,6 +179,8 @@
                 contentInput.removeAttribute("name");
                 contentInput.required = false;
                 contentInput.value = "";
+                contentInput.dataset.preserveDraft = "true";
+                sessionStorage.removeItem(pendingDraftStorageKey);
             } else if (contentInput instanceof HTMLTextAreaElement) {
                 contentInput.readOnly = true;
             }
@@ -196,6 +211,12 @@
 
     const messageInput = document.querySelector(".message-input");
     if (messageInput) {
+        const pendingDraft = sessionStorage.getItem(pendingDraftStorageKey);
+        if (pendingDraft !== null) {
+            messageInput.value = pendingDraft;
+            sessionStorage.removeItem(pendingDraftStorageKey);
+        }
+
         messageInput.focus();
         messageInput.setSelectionRange(messageInput.value.length, messageInput.value.length);
 
