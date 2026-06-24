@@ -144,23 +144,19 @@ a {
     height: 15px;
     flex: 0 0 15px;
     color: currentColor;
-    fill: var(--color-pin-yellow);
-    stroke: var(--color-pin-brown);
+    fill: none;
+    stroke: currentColor;
     stroke-linecap: round;
     stroke-linejoin: round;
-    stroke-width: 1.8;
+    stroke-width: 2;
 }
 
 .history-item {
     position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 32px;
+    grid-template-columns: minmax(0, 1fr) 28px 32px;
     align-items: center;
     border-radius: 10px;
-}
-
-.history-item.pinned {
-    grid-template-columns: minmax(0, 1fr) 28px 32px;
 }
 
 .history-item:hover,
@@ -192,27 +188,40 @@ a {
     white-space: nowrap;
 }
 
-.history-pin-badge {
+.history-favorite-form {
+    display: grid;
+    place-items: center;
+}
+
+.history-favorite-button {
     display: grid;
     place-items: center;
     width: 24px;
     height: 24px;
     justify-self: end;
+    border: 0;
     border-radius: 8px;
-    color: var(--color-pin-brown);
+    background: transparent;
+    color: var(--color-stone);
+    padding: 0;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 120ms ease, background-color 120ms ease;
+    transition: opacity 120ms ease, color 120ms ease;
 }
 
-.history-item:hover .history-pin-badge,
-.history-item:focus-within .history-pin-badge {
+.history-favorite-button.favorited {
+    color: var(--color-pin-yellow);
+}
+
+.history-favorite-button.favorited .history-pin-icon {
+    fill: currentColor;
+    stroke: none;
+}
+
+.history-item:hover .history-favorite-button,
+.history-item:focus-within .history-favorite-button {
     opacity: 1;
-}
-
-.history-item.pinned:hover .history-pin-badge,
-.history-item.pinned:focus-within .history-pin-badge {
-    background: var(--color-pin-yellow-soft);
+    pointer-events: auto;
 }
 
 .history-pin-icon {
@@ -317,13 +326,11 @@ a {
 
 .history-menu-action.pinned {
     color: var(--color-pin-brown);
-    background: var(--color-pin-yellow-soft);
 }
 
 .history-menu-action.pinned .history-menu-icon {
     fill: var(--color-pin-yellow);
-    stroke: var(--color-pin-brown);
-    stroke-width: 1.8;
+    stroke: none;
 }
 
 .history-menu-icon,

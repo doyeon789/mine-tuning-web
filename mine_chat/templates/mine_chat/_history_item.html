@@ -8,15 +8,21 @@
   >
     <span class="history-link-text">{{ session.title }}</span>
   </a>
-  {% if session.is_pinned %}
-  <span class="history-pin-badge" aria-label="즐겨찾기됨" title="즐겨찾기됨">
-    <svg class="history-pin-icon" viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        d="M12 2.4l2.9 6 6.6.9-4.8 4.7 1.1 6.6L12 17.5l-5.8 3.1 1.1-6.6-4.8-4.7 6.6-.9L12 2.4Z"
-      ></path>
-    </svg>
-  </span>
-  {% endif %}
+  <form class="history-favorite-form" action="{% url 'mine_chat:session_pin' session.pk %}" method="post">
+    {% csrf_token %}
+    <button
+      class="history-favorite-button{% if session.is_pinned %} favorited{% endif %}"
+      type="submit"
+      aria-label="{% if session.is_pinned %}즐겨찾기 해제{% else %}즐겨찾기{% endif %}"
+      title="{% if session.is_pinned %}즐겨찾기 해제{% else %}즐겨찾기{% endif %}"
+    >
+      <svg class="history-pin-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M12 2.4l2.9 6 6.6.9-4.8 4.7 1.1 6.6L12 17.5l-5.8 3.1 1.1-6.6-4.8-4.7 6.6-.9L12 2.4Z"
+        ></path>
+      </svg>
+    </button>
+  </form>
   <button
     class="history-menu-button"
     type="button"
