@@ -296,6 +296,8 @@ def session_detail(request, pk):
 def session_create(request):
     form = ChatMessageForm(request.POST)
     if "content" not in request.POST or not form.is_valid():
+        if _is_ajax(request):
+            return _chat_app_response(request, status=400)
         return redirect(f"{reverse('mine_chat:index')}?new=1")
 
     message = form.save(commit=False)
@@ -308,6 +310,8 @@ def session_create(request):
     message.save()
     _create_assistant_response(session, update_title=True)
 
+    if _is_ajax(request):
+        return _chat_app_response(request, active_session=session)
     return redirect("mine_chat:session_detail", pk=session.pk)
 
 
@@ -363,6 +367,10 @@ def message_create(request, pk):
         message.role = ChatMessage.Role.USER
         message.save()
         _create_assistant_response(session)
+        if _is_ajax(request):
+            return _chat_app_response(request, active_session=session)
+    elif _is_ajax(request):
+        return _chat_app_response(request, active_session=session, status=400)
     return redirect(reverse("mine_chat:session_detail", kwargs={"pk": session.pk}))
 
 
@@ -380,4 +388,12 @@ def message_update(request, pk):
         form.save()
         _delete_messages_after(message)
         _create_assistant_response(message.session)
+        if _is_ajax(request):
+            return _chat_app_response(request, active_session=message.session)
+    elif _is_ajax(request):
+        return _chat_app_response(
+            request,
+            active_session=message.session,
+            status=400,
+        )
     return redirect("mine_chat:session_detail", pk=message.session_id)

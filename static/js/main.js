@@ -222,6 +222,31 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
+    const submitChatForm = async (form) => {
+        try {
+            const response = await fetch(form.action, {
+                method: form.method || "POST",
+                body: new FormData(form),
+                headers: { "X-Requested-With": "XMLHttpRequest" },
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.error || "요청을 처리하지 못했습니다.");
+            }
+            if (!data.app_html) {
+                throw new Error("채팅 화면을 불러오지 못했습니다.");
+            }
+            responsePending = false;
+            replaceChatApp(data.app_html, data.url);
+        } catch (error) {
+            responsePending = false;
+            form.dataset.submitting = "false";
+            form.removeAttribute("aria-busy");
+            alert(error.message || "채팅 요청에 실패했습니다.");
+            window.location.reload();
+        }
+    };
+
     const handleChatSubmit = (event) => {
         const form = event.currentTarget;
         if (responsePending || form.dataset.submitting === "true") {
@@ -235,6 +260,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        event.preventDefault();
         const content = input.value.trim();
         responsePending = true;
         form.dataset.submitting = "true";
@@ -251,6 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
         removeFollowingMessages(form);
         setSubmittingUi(form);
         showPendingResponse(content, !form.matches("[data-message-form]"));
+        submitChatForm(form);
     };
 
     const startEdit = (button) => {

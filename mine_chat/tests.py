@@ -57,6 +57,24 @@ class ChatViewsTests(TestCase):
         self.assertEqual(session.messages.first().role, ChatMessage.Role.USER)
         self.assertEqual(session.messages.first().content, "Hello")
 
+    @patch("mine_chat.views._call_rag_api", return_value="Answer")
+    def test_ajax_message_create_returns_updated_chat_app(self, _call_rag_api):
+        session = ChatSession.objects.create(owner=self.user, title="Test chat")
+
+        response = self.client.post(
+            reverse("mine_chat:message_create", args=[session.pk]),
+            {"content": "Hello"},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json()["url"],
+            reverse("mine_chat:session_detail", args=[session.pk]),
+        )
+        self.assertIn("data-chat-app", response.json()["app_html"])
+        self.assertIn("Answer", response.json()["app_html"])
+
     def test_existing_chat_renders_loading_state_hooks(self):
         session = ChatSession.objects.create(owner=self.user, title="Test chat")
 
