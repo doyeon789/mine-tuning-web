@@ -5,3 +5,4 @@ django-allauth[socialaccount]==65.16.0
 Markdown==3.8.2
 sqlparse==0.5.5
 tzdata==2026.2
+whitenoise==6.11.0
