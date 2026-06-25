@@ -1,0 +1,95 @@
+<div
+  class="history-item{% if session.is_pinned %} pinned{% endif %}{% if active_session.pk == session.pk %} active{% endif %}"
+  data-history-item
+>
+  <form
+    class="history-title-form"
+    action="{% url 'mine_chat:session_update' session.pk %}"
+    method="post"
+    data-history-title-form
+    data-session-url="{% url 'mine_chat:session_detail' session.pk %}"
+  >
+    {% csrf_token %}
+    <textarea
+      class="history-title-textarea"
+      name="title"
+      rows="1"
+      readonly
+      required
+      data-history-title-textarea
+    >{{ session.title }}</textarea>
+  </form>
+  <form class="history-favorite-form" action="{% url 'mine_chat:session_pin' session.pk %}" method="post">
+    {% csrf_token %}
+    <button
+      class="history-favorite-button{% if session.is_pinned %} favorited{% endif %}"
+      type="submit"
+      aria-label="{% if session.is_pinned %}즐겨찾기 해제{% else %}즐겨찾기{% endif %}"
+      title="{% if session.is_pinned %}즐겨찾기 해제{% else %}즐겨찾기{% endif %}"
+    >
+      <svg class="history-pin-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M12 2.4l2.9 6 6.6.9-4.8 4.7 1.1 6.6L12 17.5l-5.8 3.1 1.1-6.6-4.8-4.7 6.6-.9L12 2.4Z"
+        ></path>
+      </svg>
+    </button>
+  </form>
+  <button
+    class="history-menu-button"
+    type="button"
+    aria-label="채팅 메뉴"
+    aria-expanded="false"
+    data-history-menu-button
+  >
+    <svg class="history-more-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="1.6"></circle>
+      <circle cx="19" cy="12" r="1.6"></circle>
+      <circle cx="5" cy="12" r="1.6"></circle>
+    </svg>
+  </button>
+  <div class="history-menu" data-history-menu hidden>
+    <button
+      class="history-menu-action"
+      type="button"
+      data-history-rename-button
+    >
+      <svg class="history-menu-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 20h9"></path>
+        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+      </svg>
+      <span>이름 바꾸기</span>
+    </button>
+    <form action="{% url 'mine_chat:session_pin' session.pk %}" method="post">
+      {% csrf_token %}
+      <button
+        class="history-menu-action{% if session.is_pinned %} pinned{% endif %}"
+        type="submit"
+      >
+        <svg class="history-menu-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M12 2.4l2.9 6 6.6.9-4.8 4.7 1.1 6.6L12 17.5l-5.8 3.1 1.1-6.6-4.8-4.7 6.6-.9L12 2.4Z"
+          ></path>
+        </svg>
+        <span>{% if session.is_pinned %}즐겨찾기 해제{% else %}즐겨찾기{% endif %}</span>
+      </button>
+    </form>
+    <div class="history-menu-separator" aria-hidden="true"></div>
+    <form
+      action="{% url 'mine_chat:session_delete' session.pk %}"
+      method="post"
+      data-confirm="이 채팅을 삭제할까요?"
+    >
+      {% csrf_token %}
+      <button class="history-menu-action danger" type="submit">
+        <svg class="history-menu-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 6h18"></path>
+          <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+          <path d="M10 11v6"></path>
+          <path d="M14 11v6"></path>
+        </svg>
+        <span>삭제</span>
+      </button>
+    </form>
+  </div>
+</div>

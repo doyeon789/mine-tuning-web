@@ -1,21 +1,10 @@
-{% extends "base.html" %}
-
-{% block content %}
-<div class="app-shell" data-chat-app>
+<div class="app-shell" data-chat-app{% if active_session %} data-active-session-id="{{ active_session.pk }}"{% endif %}>
     <aside class="sidebar">
         <div class="sidebar-top">
             <h1 class="brand">MINE_TUNING</h1>
             <form action="{% url 'mine_chat:index' %}" method="get">
                 <input type="hidden" name="new" value="1">
-                <button class="new-chat" type="submit">
-                    <span class="nav-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M12 5v14"></path>
-                            <path d="M5 12h14"></path>
-                        </svg>
-                    </span>
-                    <span>새 채팅</span>
-                </button>
+                <button class="new-chat" type="submit"><span class="nav-icon">+</span><span>새 채팅</span></button>
             </form>
             <a class="community-link" href="/community/">커뮤니티로</a>
         </div>
@@ -101,7 +90,7 @@
                         </article>
                     {% empty %}
                         <div class="empty-state">
-                            <h2>{{ auth_splash }}</h2>
+                            <h2>Where should we begin?</h2>
                         </div>
                     {% endfor %}
                 </div>
@@ -112,31 +101,21 @@
                 <div class="composer-inner">
                     {{ message_form.content }}
                     <button class="send-button" type="submit" aria-label="전송">
-                        <span class="send-button-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M12 19V5"></path>
-                                <path d="M5 12l7-7 7 7"></path>
-                            </svg>
-                        </span>
+                        <span class="send-button-icon" aria-hidden="true">↑</span>
                         <span class="send-button-loader" aria-hidden="true"></span>
                     </button>
                 </div>
             </form>
         {% else %}
             <section class="first-chat" data-first-chat>
-                <h2 data-first-chat-heading>{{ auth_splash }}</h2>
+                <h2 data-first-chat-heading>Where should we begin?</h2>
                 <div class="message-list pending-message-list" data-pending-response-host hidden></div>
                 <form class="composer first-chat-composer" action="{% url 'mine_chat:session_create' %}" method="post" data-chat-submit-form>
                     {% csrf_token %}
                     <div class="composer-inner">
                         {{ message_form.content }}
                         <button class="send-button" type="submit" aria-label="전송">
-                            <span class="send-button-icon" aria-hidden="true">
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M12 19V5"></path>
-                                    <path d="M5 12l7-7 7 7"></path>
-                                </svg>
-                            </span>
+                            <span class="send-button-icon" aria-hidden="true">↑</span>
                             <span class="send-button-loader" aria-hidden="true"></span>
                         </button>
                     </div>
@@ -162,4 +141,3 @@
         {% endif %}
     </main>
 </div>
-{% endblock content %}

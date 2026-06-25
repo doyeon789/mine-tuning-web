@@ -33,13 +33,24 @@
 
             <form class="auth-form" action="{% url 'accounts:login' %}" method="post">
                 {% csrf_token %}
-                {% if form.non_field_errors %}
-                    <div class="form-errors">{{ form.non_field_errors }}</div>
-                {% endif %}
                 <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
                 {{ form.username }}
+                {% for error in form.username.errors %}
+                    <p class="field-error" role="alert">{{ error }}</p>
+                {% endfor %}
                 <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
                 {{ form.password }}
+                {% for error in form.password.errors %}
+                    <p class="field-error" role="alert">{{ error }}</p>
+                {% endfor %}
+                {% if form.non_field_errors %}
+                    <div class="auth-login-message" role="alert">
+                        <strong>로그인할 수 없습니다.</strong>
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
                 <button class="auth-primary" type="submit">로그인</button>
             </form>
 

@@ -1,4 +1,25 @@
 ﻿document.addEventListener("DOMContentLoaded", () => {
+    const themeToggle = document.querySelector("[data-theme-toggle]");
+    if (themeToggle) {
+        const syncThemeToggle = () => {
+            const isDark = document.documentElement.dataset.theme === "dark";
+            themeToggle.setAttribute("aria-pressed", String(isDark));
+            themeToggle.setAttribute(
+                "aria-label",
+                isDark ? "라이트 모드로 전환" : "다크 모드로 전환",
+            );
+        };
+
+        syncThemeToggle();
+        themeToggle.addEventListener("click", () => {
+            const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+            document.documentElement.dataset.theme = nextTheme;
+            localStorage.setItem("mine-tuning-theme", nextTheme);
+            syncThemeToggle();
+        });
+    }
+
+    const pendingDraftStorageKey = "mine-chat-pending-draft";
     const messageScroll = document.querySelector("[data-message-scroll]");
     if (messageScroll) {
         messageScroll.scrollTop = messageScroll.scrollHeight;
@@ -15,6 +36,21 @@
     const closeHistoryMenus = () => {
         document.querySelectorAll("[data-history-menu]").forEach((menu) => {
             menu.hidden = true;
+            const item = menu.closest("[data-history-item]");
+            const titleTextarea = item.querySelector("[data-history-title-textarea]");
+            const renameButton = menu.querySelector("[data-history-rename-button]");
+
+            if (titleTextarea) {
+                titleTextarea.readOnly = true;
+                titleTextarea.value = titleTextarea.defaultValue;
+            }
+
+            if (renameButton) {
+                renameButton.hidden = false;
+            }
+        });
+        document.querySelectorAll("[data-history-menu-button]").forEach((button) => {
+            button.setAttribute("aria-expanded", "false");
         });
     };
     
@@ -27,10 +63,44 @@
 
             closeHistoryMenus();
             menu.hidden = !shouldOpen;
-            if (shouldOpen) {
-                const input = menu.querySelector("input");
-                input.focus();
-                input.select();
+            button.setAttribute("aria-expanded", String(shouldOpen));
+        });
+    });
+
+    document.querySelectorAll("[data-history-rename-button]").forEach((button) => {
+        button.addEventListener("click", (event) => {
+            event.stopPropagation();
+            const item = button.closest("[data-history-item]");
+            const titleTextarea = item.querySelector("[data-history-title-textarea]");
+
+            closeHistoryMenus();
+            button.hidden = true;
+            titleTextarea.readOnly = false;
+            titleTextarea.focus();
+            titleTextarea.select();
+        });
+    });
+
+    document.querySelectorAll("[data-history-title-form]").forEach((form) => {
+        const titleTextarea = form.querySelector("[data-history-title-textarea]");
+
+        titleTextarea.addEventListener("click", () => {
+            if (titleTextarea.readOnly) {
+                window.location.href = form.dataset.sessionUrl;
+            }
+        });
+
+        titleTextarea.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                event.preventDefault();
+                titleTextarea.value = titleTextarea.defaultValue;
+                closeHistoryMenus();
+                return;
+            }
+
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                form.requestSubmit();
             }
         });
     });
@@ -84,12 +154,41 @@
                 form.requestSubmit();
             }
         });
+
+        textarea.addEventListener("input", () => {
+            if (textarea.dataset.preserveDraft !== "true") {
+                return;
+            }
+
+            if (textarea.value) {
+                sessionStorage.setItem(pendingDraftStorageKey, textarea.value);
+            } else {
+                sessionStorage.removeItem(pendingDraftStorageKey);
+            }
+        });
     });
 
-    const showPendingResponse = () => {
+    const showPendingResponse = (content, showUserMessage) => {
         const host = document.querySelector("[data-pending-response-host]");
         if (!host || host.querySelector("[data-pending-response]")) {
             return;
+        }
+
+        const emptyState = host.querySelector(".empty-state");
+        if (emptyState) {
+            emptyState.remove();
+        }
+
+        if (showUserMessage) {
+            const pendingUserMessage = document.createElement("article");
+            const pendingUserContent = document.createElement("div");
+
+            pendingUserMessage.className = "message user pending-user-message";
+            pendingUserMessage.dataset.pendingUserMessage = "";
+            pendingUserContent.className = "message-content";
+            pendingUserContent.textContent = content;
+            pendingUserMessage.appendChild(pendingUserContent);
+            host.appendChild(pendingUserMessage);
         }
 
         const pendingResponse = document.createElement("article");
@@ -128,6 +227,8 @@
                 return;
             }
 
+            const submittedContent = contentInput.value.trim();
+
             form.dataset.submitting = "true";
             form.setAttribute("aria-busy", "true");
 
@@ -137,8 +238,27 @@
                 });
             });
 
-            if (contentInput instanceof HTMLTextAreaElement) {
+            if (contentInput.classList.contains("message-input")) {
+                const submittedContentInput = document.createElement("input");
+                submittedContentInput.type = "hidden";
+                submittedContentInput.name = "content";
+                submittedContentInput.value = contentInput.value;
+                form.appendChild(submittedContentInput);
+
+                contentInput.removeAttribute("name");
+                contentInput.required = false;
+                contentInput.value = "";
+                contentInput.dataset.preserveDraft = "true";
+                sessionStorage.removeItem(pendingDraftStorageKey);
+            } else if (contentInput instanceof HTMLTextAreaElement) {
                 contentInput.readOnly = true;
+            }
+
+            const firstChat = document.querySelector("[data-first-chat]");
+            if (firstChat) {
+                firstChat.classList.add("is-submitting");
+                document.querySelector("[data-first-chat-heading]")?.setAttribute("hidden", "");
+                document.querySelector("[data-example-questions]")?.setAttribute("hidden", "");
             }
 
             const submitButton = form.querySelector("button[type='submit']");
@@ -151,12 +271,21 @@
                 submitButton.setAttribute("aria-label", "답변 생성 중");
             }
 
-            showPendingResponse();
+            showPendingResponse(
+                submittedContent,
+                !form.matches("[data-message-form]")
+            );
         });
     });
 
     const messageInput = document.querySelector(".message-input");
     if (messageInput) {
+        const pendingDraft = sessionStorage.getItem(pendingDraftStorageKey);
+        if (pendingDraft !== null) {
+            messageInput.value = pendingDraft;
+            sessionStorage.removeItem(pendingDraftStorageKey);
+        }
+
         messageInput.focus();
         messageInput.setSelectionRange(messageInput.value.length, messageInput.value.length);
 
@@ -234,4 +363,3 @@
         textarea.addEventListener("input", () => resizeMessageEditInput(textarea));
     });
 });
-

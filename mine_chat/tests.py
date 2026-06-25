@@ -3,6 +3,7 @@ from datetime import timedelta
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.html import escape
 from django.utils import timezone
 
 from .models import ChatMessage, ChatSession
@@ -23,9 +24,11 @@ class ChatViewsTests(TestCase):
         response = self.client.get(reverse("mine_chat:index"), {"new": "1"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Where should we begin?")
+        self.assertContains(response, escape(response.context["auth_splash"]))
         self.assertContains(response, "data-chat-submit-form")
         self.assertContains(response, "data-pending-response-host")
+        self.assertContains(response, "data-first-chat")
+        self.assertContains(response, "data-example-questions")
         self.assertEqual(ChatSession.objects.count(), 1)
         self.assertNotContains(response, '<div class="chat-topbar">', html=False)
 
@@ -116,6 +119,46 @@ class ChatViewsTests(TestCase):
         sessions = list(_user_sessions(self.user))
         self.assertEqual(sessions[0], newer_session)
         self.assertEqual(sessions[1], older_session)
+
+    def test_pinned_sessions_are_ordered_before_recent_sessions(self):
+        pinned_session = ChatSession.objects.create(
+            owner=self.user,
+            title="Pinned",
+            is_pinned=True,
+        )
+        recent_session = ChatSession.objects.create(owner=self.user, title="Recent")
+        now = timezone.now()
+        pinned_message = ChatMessage.objects.create(
+            session=pinned_session,
+            role=ChatMessage.Role.USER,
+            content="Pinned message",
+        )
+        recent_message = ChatMessage.objects.create(
+            session=recent_session,
+            role=ChatMessage.Role.USER,
+            content="Recent message",
+        )
+        ChatMessage.objects.filter(pk=pinned_message.pk).update(created_at=now - timedelta(hours=1))
+        ChatMessage.objects.filter(pk=recent_message.pk).update(created_at=now)
+
+        sessions = list(_user_sessions(self.user))
+
+        self.assertEqual(sessions[0], pinned_session)
+        self.assertEqual(sessions[1], recent_session)
+
+    def test_session_pin_toggles_pinned_state(self):
+        session = ChatSession.objects.create(owner=self.user, title="Test chat")
+
+        response = self.client.post(reverse("mine_chat:session_pin", args=[session.pk]))
+
+        self.assertRedirects(response, reverse("mine_chat:session_detail", args=[session.pk]))
+        session.refresh_from_db()
+        self.assertTrue(session.is_pinned)
+
+        self.client.post(reverse("mine_chat:session_pin", args=[session.pk]))
+
+        session.refresh_from_db()
+        self.assertFalse(session.is_pinned)
 
     def test_update_user_message_removes_later_messages_and_recreates_response(self):
         session = ChatSession.objects.create(owner=self.user, title="Test chat")

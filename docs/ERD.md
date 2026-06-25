@@ -41,6 +41,7 @@ erDiagram
         bigint id PK
         bigint owner_id FK "nullable"
         varchar title "max_length=120"
+        bool is_pinned "default=False"
         datetime created_at
         datetime updated_at
     }
@@ -117,10 +118,15 @@ Django 기본 사용자 모델입니다. 프로젝트의 `settings.AUTH_USER_MOD
 | `id` | bigint | NO | PK | Django `BigAutoField` |
 | `owner_id` | bigint | YES | FK | `auth_user.id` 참조 |
 | `title` | varchar(120) | NO | | 채팅방 제목 |
+| `is_pinned` | bool | NO | | 채팅 고정 여부, 기본값 `False` |
 | `created_at` | datetime | NO | | 생성 시간 |
 | `updated_at` | datetime | NO | | 수정 시간 |
 
-정렬 기준: `updated_at` 내림차순
+목록 정렬 기준: `is_pinned` 내림차순, `last_activity_at` 내림차순, `created_at` 내림차순
+
+`last_activity_at`은 마지막 메시지 생성 시간이 있으면 그 값을 사용하고, 없으면 채팅 세션의 `created_at`을 사용합니다.
+
+모델 기본 정렬 기준: `updated_at` 내림차순
 
 ### `mine_chat_chatmessage`
 
