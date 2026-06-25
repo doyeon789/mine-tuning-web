@@ -266,6 +266,39 @@ class ChatViewsTests(TestCase):
             ChatMessage.objects.filter(pk=later_user_message.pk).exists()
         )
 
+    def test_delete_first_user_message_removes_chat_session(self):
+        session = ChatSession.objects.create(owner=self.user, title="Test chat")
+        first_user_message = ChatMessage.objects.create(
+            session=session,
+            role=ChatMessage.Role.USER,
+            content="First question",
+        )
+        ChatMessage.objects.create(
+            session=session,
+            role=ChatMessage.Role.ASSISTANT,
+            content="First answer",
+        )
+        ChatMessage.objects.create(
+            session=session,
+            role=ChatMessage.Role.USER,
+            content="Later question",
+        )
+
+        response = self.client.post(
+            reverse(
+                "mine_chat:message_delete",
+                args=[first_user_message.pk],
+            ),
+        )
+
+        self.assertRedirects(response, reverse("mine_chat:index"))
+        self.assertFalse(
+            ChatSession.objects.filter(pk=session.pk).exists()
+        )
+        self.assertFalse(
+            ChatMessage.objects.filter(session_id=session.pk).exists()
+        )
+
     def test_assistant_message_cannot_be_deleted(self):
         session = ChatSession.objects.create(owner=self.user, title="Test chat")
         assistant_message = ChatMessage.objects.create(

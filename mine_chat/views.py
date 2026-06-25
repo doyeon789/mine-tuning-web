@@ -201,6 +201,15 @@ def message_delete(request, pk):
         session__owner=request.user,
         role=ChatMessage.Role.USER,
     )
+    session = message.session
+    first_user_message = session.messages.filter(
+        role=ChatMessage.Role.USER,
+    ).first()
+
+    if first_user_message and first_user_message.pk == message.pk:
+        session.delete()
+        return redirect("mine_chat:index")
+
     session_id = message.session_id
     _delete_messages_from(message)
     return redirect("mine_chat:session_detail", pk=session_id)
