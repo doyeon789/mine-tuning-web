@@ -1266,6 +1266,16 @@ a {
   background: var(--color-moss-soft);
 }
 
+.auth-oauth-google {
+  border-color: #ffffff;
+  background: #ffffff;
+  color: #111111;
+}
+
+.auth-oauth-google:hover {
+  background: #f2f2f2;
+}
+
 .auth-oauth-kakao {
   border-color: #fee500;
   background: #fee500;
