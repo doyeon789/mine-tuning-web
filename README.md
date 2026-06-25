@@ -113,7 +113,7 @@ Minecraft 질문을 입력하면 외부 AI API의 답변을 대화 형태로 확
 | 구분 | 기술 |
 | --- | --- |
 | Backend | Python, Django 5.2 |
-| Database | SQLite |
+| Database | SQLite (개발), PostgreSQL (배포) |
 | Authentication | Django Auth, django-allauth |
 | Frontend | Django Template, HTML, CSS, JavaScript ES Modules |
 | Markdown | Python-Markdown |
@@ -121,6 +121,7 @@ Minecraft 질문을 입력하면 외부 AI API의 답변을 대화 형태로 확
 | Image Storage | Django File Storage |
 | External API | Minecraft AI/RAG API |
 | Test | Django TestCase |
+| Deployment | Render, Gunicorn, WhiteNoise |
 
 ## 프로젝트 구조
 
@@ -148,6 +149,8 @@ mine-tuning-web/
 ├─ docs/
 │  ├─ images/                # README 화면 캡처
 │  └─ ERD.md                 # 데이터 모델 문서
+├─ build.sh                  # Render 빌드 및 배포 준비 스크립트
+├─ render.yaml               # Render Web Service와 PostgreSQL 설정
 ├─ manage.py
 └─ requirements.txt
 ```
@@ -233,6 +236,33 @@ python manage.py runserver
 
 브라우저에서 `http://127.0.0.1:8000/`에 접속합니다.
 
+## 배포
+
+이 프로젝트는 [Render](https://render.com/)를 통해 배포합니다. `render.yaml`에 Django Web Service와 PostgreSQL 데이터베이스 구성을 정의했습니다.
+
+배포 과정은 다음과 같습니다.
+
+1. Render가 `build.sh`를 실행해 Python 패키지를 설치합니다.
+2. `collectstatic`으로 정적 파일을 수집합니다.
+3. 데이터베이스 마이그레이션을 적용합니다.
+4. Gunicorn으로 Django WSGI 애플리케이션을 실행합니다.
+5. WhiteNoise가 배포 환경의 정적 파일을 제공합니다.
+
+Render에서 사용하는 주요 환경변수는 다음과 같습니다.
+
+| 환경변수 | 설명 |
+| --- | --- |
+| `DEBUG` | 배포 환경에서 `False`로 설정 |
+| `SECRET_KEY` | Render에서 안전한 값으로 자동 생성 |
+| `DATABASE_URL` | Render PostgreSQL 연결 정보 |
+| `RENDER_EXTERNAL_HOSTNAME` | 배포 도메인을 허용 호스트와 CSRF 신뢰 출처에 반영 |
+| `NGROK_URL` | Minecraft AI/RAG API 주소 |
+| `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` | Google OAuth 설정 |
+| `KAKAO_OAUTH_CLIENT_ID`, `KAKAO_OAUTH_CLIENT_SECRET` | Kakao OAuth 설정 |
+| `NAVER_OAUTH_CLIENT_ID`, `NAVER_OAUTH_CLIENT_SECRET` | Naver OAuth 설정 |
+
+OAuth 공급자의 개발자 콘솔에는 로컬 주소 대신 Render의 HTTPS 배포 도메인을 사용한 콜백 URL도 등록해야 합니다.
+
 ## OAuth 설정
 
 각 OAuth 서비스의 개발자 콘솔에서 애플리케이션을 등록하고 아래 콜백 URL을 등록해야 합니다.
@@ -312,7 +342,7 @@ python manage.py test community
 
 **Backend**
 
-`Python` · `Django 5.2` · `SQLite`
+`Python` · `Django 5.2` · `SQLite` · `PostgreSQL`
 
 **Frontend**
 
@@ -333,3 +363,7 @@ python manage.py test community
 **테스트 및 개발 환경**
 
 `Django TestCase` · `Git` · `GitHub`
+
+**배포**
+
+`Render` · `Gunicorn` · `WhiteNoise` · `dj-database-url`
