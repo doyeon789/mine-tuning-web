@@ -2294,10 +2294,14 @@ body:has(.community-page) {
 .community-markdown code,
 .community-markdown-guide code {
   border-radius: 6px;
-  background: #f2f2f2;
   padding: 2px 6px;
   font-family: Consolas, "Courier New", monospace;
   font-size: 0.92em;
+}
+
+.community-markdown code {
+  background: var(--community-neutral-50);
+  color: var(--community-neutral-900);
 }
 
 .community-markdown pre code {
@@ -2313,21 +2317,33 @@ body:has(.community-page) {
 .community-markdown-guide {
   border-radius: 12px;
   border: 1px solid var(--community-neutral-100);
-  background: var(--community-neutral-50);
-  color: #5d5d5d;
-  padding: 14px 16px;
+  background: var(--color-snow);
+  color: var(--community-neutral-700);
+  padding: 16px 18px;
   font-size: 14px;
+  line-height: 1.65;
+  box-shadow: 0 8px 24px rgba(13, 13, 13, 0.04);
 }
 
 .community-markdown-guide strong {
   color: var(--community-blue-600);
 }
 
+.community-markdown-guide code {
+  border: 1px solid var(--community-neutral-100);
+  background: var(--color-arctic-mist);
+  color: var(--community-neutral-900);
+}
+
 .community-markdown-guide ul {
   display: grid;
-  gap: 6px;
-  margin: 10px 0 0;
+  gap: 8px;
+  margin: 12px 0 0;
   padding-left: 20px;
+}
+
+.community-markdown-guide li::marker {
+  color: var(--community-blue-600);
 }
 
 .community-post-meta {
