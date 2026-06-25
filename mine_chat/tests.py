@@ -213,3 +213,90 @@ class ChatViewsTests(TestCase):
         self.assertEqual(response.status_code, 404)
         assistant_message.refresh_from_db()
         self.assertEqual(assistant_message.content, "Answer")
+
+    def test_delete_user_message_removes_selected_and_later_messages(self):
+        session = ChatSession.objects.create(owner=self.user, title="Test chat")
+        earlier_user_message = ChatMessage.objects.create(
+            session=session,
+            role=ChatMessage.Role.USER,
+            content="Keep this question",
+        )
+        earlier_assistant_message = ChatMessage.objects.create(
+            session=session,
+            role=ChatMessage.Role.ASSISTANT,
+            content="Keep this answer",
+        )
+        selected_message = ChatMessage.objects.create(
+            session=session,
+            role=ChatMessage.Role.USER,
+            content="Delete from here",
+        )
+        later_assistant_message = ChatMessage.objects.create(
+            session=session,
+            role=ChatMessage.Role.ASSISTANT,
+            content="Delete this answer",
+        )
+        later_user_message = ChatMessage.objects.create(
+            session=session,
+            role=ChatMessage.Role.USER,
+            content="Delete this question too",
+        )
+
+        response = self.client.post(
+            reverse("mine_chat:message_delete", args=[selected_message.pk]),
+        )
+
+        self.assertRedirects(
+            response,
+            reverse("mine_chat:session_detail", args=[session.pk]),
+        )
+        self.assertTrue(
+            ChatMessage.objects.filter(pk=earlier_user_message.pk).exists()
+        )
+        self.assertTrue(
+            ChatMessage.objects.filter(pk=earlier_assistant_message.pk).exists()
+        )
+        self.assertFalse(
+            ChatMessage.objects.filter(pk=selected_message.pk).exists()
+        )
+        self.assertFalse(
+            ChatMessage.objects.filter(pk=later_assistant_message.pk).exists()
+        )
+        self.assertFalse(
+            ChatMessage.objects.filter(pk=later_user_message.pk).exists()
+        )
+
+    def test_assistant_message_cannot_be_deleted(self):
+        session = ChatSession.objects.create(owner=self.user, title="Test chat")
+        assistant_message = ChatMessage.objects.create(
+            session=session,
+            role=ChatMessage.Role.ASSISTANT,
+            content="Answer",
+        )
+
+        response = self.client.post(
+            reverse("mine_chat:message_delete", args=[assistant_message.pk]),
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(
+            ChatMessage.objects.filter(pk=assistant_message.pk).exists()
+        )
+
+    def test_chat_page_renders_message_delete_button(self):
+        session = ChatSession.objects.create(owner=self.user, title="Test chat")
+        message = ChatMessage.objects.create(
+            session=session,
+            role=ChatMessage.Role.USER,
+            content="Question",
+        )
+
+        response = self.client.get(
+            reverse("mine_chat:session_detail", args=[session.pk]),
+        )
+
+        self.assertContains(
+            response,
+            reverse("mine_chat:message_delete", args=[message.pk]),
+        )
+        self.assertContains(response, "data-message-delete")

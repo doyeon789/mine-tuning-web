@@ -144,6 +144,13 @@ const setSubmitButtonLoading = (form) => {
 const initializeChatForms = () => {
     document.querySelectorAll("[data-chat-submit-form]").forEach((form) => {
         form.addEventListener("submit", (event) => {
+            if (
+                event.defaultPrevented ||
+                event.submitter?.matches("[data-message-delete]")
+            ) {
+                return;
+            }
+
             if (form.dataset.submitting === "true") {
                 event.preventDefault();
                 return;

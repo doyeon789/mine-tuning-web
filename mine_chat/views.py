@@ -83,6 +83,13 @@ def _delete_messages_after(user_message):
     ).delete()
 
 
+def _delete_messages_from(user_message):
+    ChatMessage.objects.filter(
+        session=user_message.session,
+        pk__gte=user_message.pk,
+    ).delete()
+
+
 def _make_session_title(content):
     title = " ".join(content.split())
     if len(title) <= SESSION_TITLE_MAX_LENGTH:
@@ -183,3 +190,17 @@ def message_update(request, pk):
         _delete_messages_after(message)
         _create_assistant_response(message.session)
     return redirect("mine_chat:session_detail", pk=message.session_id)
+
+
+@require_POST
+@login_required
+def message_delete(request, pk):
+    message = get_object_or_404(
+        ChatMessage,
+        pk=pk,
+        session__owner=request.user,
+        role=ChatMessage.Role.USER,
+    )
+    session_id = message.session_id
+    _delete_messages_from(message)
+    return redirect("mine_chat:session_detail", pk=session_id)

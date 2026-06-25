@@ -790,6 +790,7 @@
 }
 
 .message-action-button,
+.message-delete-button,
 .message-edit-button,
 .message-cancel-button {
   justify-self: end;
@@ -807,6 +808,12 @@
   border-color: transparent;
   background: transparent;
   color: var(--color-pewter);
+}
+
+.message-delete-button {
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-danger);
 }
 
 .message-edit-button {

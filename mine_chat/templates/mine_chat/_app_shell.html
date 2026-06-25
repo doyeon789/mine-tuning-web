@@ -79,6 +79,15 @@
                                     <div class="message-meta">
                                         <div class="message-actions">
                                             <button class="message-action-button" type="button" data-edit-message>수정</button>
+                                            <button
+                                                class="message-delete-button"
+                                                type="submit"
+                                                formaction="{% url 'mine_chat:message_delete' message.pk %}"
+                                                data-message-delete
+                                                data-confirm="이 메시지와 이후 대화를 모두 삭제할까요?"
+                                            >
+                                                삭제
+                                            </button>
                                             <button class="message-edit-button" type="submit" hidden>저장</button>
                                             <button class="message-cancel-button" type="button" data-cancel-edit hidden>취소</button>
                                         </div>

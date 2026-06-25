@@ -13,4 +13,5 @@ urlpatterns = [
     path('chats/<int:pk>/delete/', views.session_delete, name='session_delete'),
     path('chats/<int:pk>/messages/', views.message_create, name='message_create'),
     path('messages/<int:pk>/edit/', views.message_update, name='message_update'),
+    path('messages/<int:pk>/delete/', views.message_delete, name='message_delete'),
 ]
