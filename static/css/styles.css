@@ -1549,7 +1549,7 @@ a {
     border: 1px solid var(--community-neutral-100);
     border-radius: 8px;
     padding: 12px 14px;
-    resize: vertical;
+    resize: none;
     line-height: 1.6;
 }
 
