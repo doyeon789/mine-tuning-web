@@ -160,6 +160,46 @@ class ChatViewsTests(TestCase):
         session.refresh_from_db()
         self.assertFalse(session.is_pinned)
 
+    def test_session_pin_ajax_returns_updated_chat_app(self):
+        active_session = ChatSession.objects.create(
+            owner=self.user,
+            title="Active chat",
+        )
+        pinned_session = ChatSession.objects.create(owner=self.user, title="Pin me")
+
+        response = self.client.post(
+            reverse("mine_chat:session_pin", args=[pinned_session.pk]),
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            HTTP_X_ACTIVE_SESSION=str(active_session.pk),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("app_html", data)
+        self.assertIn('data-chat-app', data["app_html"])
+        self.assertIn('data-active-session-id="%s"' % active_session.pk, data["app_html"])
+        self.assertIn("즐겨찾기 해제", data["app_html"])
+        pinned_session.refresh_from_db()
+        self.assertTrue(pinned_session.is_pinned)
+
+    def test_session_update_ajax_returns_renamed_chat_app(self):
+        session = ChatSession.objects.create(owner=self.user, title="Before")
+
+        response = self.client.post(
+            reverse("mine_chat:session_update", args=[session.pk]),
+            {"title": "After"},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            HTTP_X_ACTIVE_SESSION=str(session.pk),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("app_html", data)
+        self.assertIn("After", data["app_html"])
+        self.assertIn('data-active-session-id="%s"' % session.pk, data["app_html"])
+        session.refresh_from_db()
+        self.assertEqual(session.title, "After")
+
     def test_update_user_message_removes_later_messages_and_recreates_response(self):
         session = ChatSession.objects.create(owner=self.user, title="Test chat")
         user_message = ChatMessage.objects.create(

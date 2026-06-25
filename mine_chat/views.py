@@ -1,7 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import DateTimeField, Max
 from django.db.models.functions import Coalesce
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 import requests
@@ -38,6 +40,34 @@ def _chat_context(user, active_session=None, message_form=None, session_form=Non
         "message_form": message_form or ChatMessageForm(),
         "session_form": session_form or ChatSessionForm(instance=active_session),
     }
+
+
+def _is_ajax(request):
+    return request.headers.get("x-requested-with") == "XMLHttpRequest"
+
+
+def _request_active_session(request, fallback_session=None):
+    active_session_id = request.headers.get("x-active-session")
+    if not active_session_id:
+        return fallback_session
+
+    try:
+        return ChatSession.objects.get(pk=active_session_id, owner=request.user)
+    except (ChatSession.DoesNotExist, ValueError):
+        return fallback_session
+
+
+def _chat_app_response(request, active_session=None):
+    context = _chat_context(request.user, active_session=active_session)
+    return JsonResponse(
+        {
+            "app_html": render_to_string(
+                "mine_chat/_app_shell.html",
+                context,
+                request=request,
+            )
+        }
+    )
 
 
 def _call_rag_api(question: str) -> str:
@@ -140,7 +170,12 @@ def session_update(request, pk):
     session = get_object_or_404(ChatSession, pk=pk, owner=request.user)
     form = ChatSessionForm(request.POST, instance=session)
     if form.is_valid():
-        form.save()
+        session = form.save()
+    if _is_ajax(request):
+        active_session = _request_active_session(request, session)
+        if active_session and active_session.pk == session.pk:
+            active_session = session
+        return _chat_app_response(request, active_session=active_session)
     return redirect("mine_chat:session_detail", pk=session.pk)
 
 
@@ -148,7 +183,13 @@ def session_update(request, pk):
 @login_required
 def session_delete(request, pk):
     session = get_object_or_404(ChatSession, pk=pk, owner=request.user)
+    active_session = _request_active_session(request)
+    deleting_active_session = active_session and active_session.pk == session.pk
     session.delete()
+    if _is_ajax(request):
+        if deleting_active_session:
+            return JsonResponse({"redirect_url": reverse("mine_chat:index")})
+        return _chat_app_response(request, active_session=active_session)
     return redirect("mine_chat:index")
 
 
@@ -158,6 +199,11 @@ def session_pin(request, pk):
     session = get_object_or_404(ChatSession, pk=pk, owner=request.user)
     session.is_pinned = not session.is_pinned
     session.save(update_fields=["is_pinned"])
+    if _is_ajax(request):
+        return _chat_app_response(
+            request,
+            active_session=_request_active_session(request, session),
+        )
     return redirect("mine_chat:session_detail", pk=session.pk)
 
 
