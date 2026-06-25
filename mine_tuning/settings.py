@@ -10,8 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import mimetypes
 import os
 from pathlib import Path
+
+# Windows can map .js files to text/plain, which browsers reject for ES modules.
+mimetypes.add_type("application/javascript", ".js", strict=True)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
