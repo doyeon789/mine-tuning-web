@@ -6,7 +6,6 @@
     class="history-title-form"
     action="{% url 'mine_chat:session_update' session.pk %}"
     method="post"
-    data-history-ajax-form
     data-history-title-form
     data-session-url="{% url 'mine_chat:session_detail' session.pk %}"
   >
@@ -20,7 +19,7 @@
       data-history-title-textarea
     >{{ session.title }}</textarea>
   </form>
-  <form class="history-favorite-form" action="{% url 'mine_chat:session_pin' session.pk %}" method="post" data-history-ajax-form>
+  <form class="history-favorite-form" action="{% url 'mine_chat:session_pin' session.pk %}" method="post">
     {% csrf_token %}
     <button
       class="history-favorite-button{% if session.is_pinned %} favorited{% endif %}"
@@ -60,7 +59,7 @@
       </svg>
       <span>이름 바꾸기</span>
     </button>
-    <form action="{% url 'mine_chat:session_pin' session.pk %}" method="post" data-history-ajax-form>
+    <form action="{% url 'mine_chat:session_pin' session.pk %}" method="post">
       {% csrf_token %}
       <button
         class="history-menu-action{% if session.is_pinned %} pinned{% endif %}"
@@ -79,7 +78,6 @@
       action="{% url 'mine_chat:session_delete' session.pk %}"
       method="post"
       data-confirm="이 채팅을 삭제할까요?"
-      data-history-ajax-form
     >
       {% csrf_token %}
       <button class="history-menu-action danger" type="submit">
