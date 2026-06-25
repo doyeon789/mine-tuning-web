@@ -1,7 +1,44 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const DRAFT_KEY = "mine-chat-pending-draft";
-    const MAX_INPUT_HEIGHT = 240;
-    let responsePending = false;
+﻿document.addEventListener("DOMContentLoaded", () => {
+    const themeToggle = document.querySelector("[data-theme-toggle]");
+    if (themeToggle) {
+        const syncThemeToggle = () => {
+            const isDark = document.documentElement.dataset.theme === "dark";
+            themeToggle.setAttribute("aria-pressed", String(isDark));
+            themeToggle.setAttribute(
+                "aria-label",
+                isDark ? "라이트 모드로 전환" : "다크 모드로 전환",
+            );
+        };
+
+        syncThemeToggle();
+        themeToggle.addEventListener("click", () => {
+            const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+            document.documentElement.dataset.theme = nextTheme;
+            localStorage.setItem("mine-tuning-theme", nextTheme);
+            syncThemeToggle();
+        });
+    }
+
+    const pendingDraftStorageKey = "mine-chat-pending-draft";
+    const messageScroll = document.querySelector("[data-message-scroll]");
+    if (messageScroll) {
+        messageScroll.scrollTop = messageScroll.scrollHeight;
+    }
+
+    document.querySelectorAll("[data-confirm]").forEach((form) => {
+        form.addEventListener("submit", (event) => {
+            if (!window.confirm(form.dataset.confirm)) {
+                event.preventDefault();
+            }
+        });
+    });
+
+    const closeHistoryMenus = () => {
+        document.querySelectorAll("[data-history-menu]").forEach((menu) => {
+            menu.hidden = true;
+            const item = menu.closest("[data-history-item]");
+            const titleTextarea = item.querySelector("[data-history-title-textarea]");
+            const renameButton = menu.querySelector("[data-history-rename-button]");
 
     const all = (selector, root = document) => [...root.querySelectorAll(selector)];
 
