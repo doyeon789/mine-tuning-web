@@ -165,7 +165,7 @@
   color: var(--color-stone);
   padding: 0;
   opacity: 0;
-  pointer-events: none;
+  pointer-events: auto;
   transition:
     opacity 120ms ease,
     color 120ms ease;
@@ -204,7 +204,7 @@
   background: transparent;
   color: var(--color-stone);
   opacity: 0;
-  pointer-events: none;
+  pointer-events: auto;
   transition:
     opacity 120ms ease,
     background-color 120ms ease;
@@ -983,19 +983,50 @@
   }
 
   .sidebar {
+    position: relative;
     min-height: auto;
     height: auto;
     border-right: 0;
     border-bottom: 1px solid var(--color-arctic-mist);
+    padding-right: 58px;
   }
 
   .chat-main {
     height: auto;
   }
 
-  .history-section,
-  .account-panel {
+  .history-section {
     display: none;
+  }
+
+  .account-panel {
+    position: absolute;
+    top: 12px;
+    right: 10px;
+    z-index: 20;
+    display: block;
+    margin: 0;
+    border-top: 0;
+    padding: 0;
+  }
+
+  .account-menu-wrap {
+    display: block;
+  }
+
+  .account-name {
+    display: none;
+  }
+
+  .account-menu {
+    top: calc(100% + 8px);
+    right: 0;
+    bottom: auto;
+  }
+
+  .history-favorite-button,
+  .history-menu-button {
+    opacity: 1;
   }
 
   .chat-topbar,
@@ -1026,4 +1057,3 @@
     max-width: 92%;
   }
 }
-

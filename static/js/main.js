@@ -1,10 +1,18 @@
-import { initializeChat } from "./modules/chat.js";
-import { initializeConfirmations } from "./modules/confirmations.js";
-import { initializeMessageEditing } from "./modules/message_edit.js";
-import { initializeNavigation } from "./modules/navigation.js";
-import { initializeThemeToggle } from "./modules/theme.js";
+const initializeApp = async () => {
+    const [
+        { initializeChat },
+        { initializeConfirmations },
+        { initializeMessageEditing },
+        { initializeNavigation },
+        { initializeThemeToggle },
+    ] = await Promise.all([
+        import("./modules/chat.js?v=20260625-module-loader"),
+        import("./modules/confirmations.js?v=20260625-module-loader"),
+        import("./modules/message_edit.js?v=20260625-module-loader"),
+        import("./modules/navigation.js?v=20260625-module-loader"),
+        import("./modules/theme.js?v=20260625-module-loader"),
+    ]);
 
-const initializeApp = () => {
     initializeThemeToggle();
     initializeConfirmations();
     initializeNavigation();
@@ -15,5 +23,5 @@ const initializeApp = () => {
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initializeApp, { once: true });
 } else {
-    initializeApp();
+    void initializeApp();
 }
