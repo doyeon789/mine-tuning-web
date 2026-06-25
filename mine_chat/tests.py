@@ -1,4 +1,5 @@
 from datetime import timedelta
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -7,7 +8,14 @@ from django.utils.html import escape
 from django.utils import timezone
 
 from .models import ChatMessage, ChatSession
-from .views import SESSION_TITLE_MAX_LENGTH, _make_session_title, _user_sessions
+from .views import (
+    SESSION_TITLE_MAX_LENGTH,
+    TITLE_API_TIMEOUT_SECONDS,
+    TITLE_API_URL,
+    _call_title_api,
+    _make_session_title,
+    _user_sessions,
+)
 
 
 class ChatViewsTests(TestCase):
@@ -93,6 +101,29 @@ class ChatViewsTests(TestCase):
 
         self.assertEqual(len(title), SESSION_TITLE_MAX_LENGTH)
         self.assertTrue(title.endswith("..."))
+
+    @patch("mine_chat.views.requests.post")
+    def test_title_api_uses_render_server(self, post):
+        post.return_value.json.return_value = {"title": '"Diamond Mining!"'}
+
+        title = _call_title_api(
+            "How do I mine diamonds?",
+            "Mine near Y -59.",
+        )
+
+        self.assertEqual(title, "Diamond Mining")
+        post.assert_called_once_with(
+            "https://title-api-server.onrender.com/api/titles/",
+            json={
+                "question": "How do I mine diamonds?",
+                "answer": "Mine near Y -59.",
+            },
+            timeout=TITLE_API_TIMEOUT_SECONDS,
+        )
+        self.assertEqual(
+            TITLE_API_URL,
+            "https://title-api-server.onrender.com/api/titles/",
+        )
 
     def test_sessions_order_by_latest_message_not_rename_time(self):
         older_session = ChatSession.objects.create(owner=self.user, title="Older")
