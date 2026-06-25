@@ -305,3 +305,31 @@ python manage.py test community
 - CSS는 역할별 파일로 분리되어 `styles.css`에서 순서대로 불러옵니다.
 - JavaScript는 ES 모듈로 구성되어 있으며 `.js` 응답은 `application/javascript` MIME 타입을 사용합니다.
 - 이미지 업로드와 외부 API 호출을 운영 환경에서 사용할 경우 저장소, 용량 제한, 타임아웃, 비밀키 관리를 별도로 구성해야 합니다.
+
+---
+
+## 사용 기술 및 라이브러리
+
+**Backend**
+
+`Python` · `Django 5.2` · `SQLite`
+
+**Frontend**
+
+`HTML5` · `CSS3` · `JavaScript` · `ES Modules` · `Django Template`
+
+**인증**
+
+`Django Authentication` · `django-allauth` · `Google OAuth` · `Kakao OAuth` · `Naver OAuth`
+
+**콘텐츠 및 보안**
+
+`Python-Markdown` · `Bleach` · `Django File Storage`
+
+**통신 및 외부 연동**
+
+`Fetch API` · `REST API` · `Minecraft AI/RAG API`
+
+**테스트 및 개발 환경**
+
+`Django TestCase` · `Git` · `GitHub`
