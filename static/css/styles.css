@@ -1008,7 +1008,8 @@ a {
   width: 100%;
   min-height: 52px;
   max-height: 240px;
-  resize: vertical;
+  resize: none;
+  overflow-y: hidden;
   border: 0;
   border-radius: 0;
   padding: 13px 0;
