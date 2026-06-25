@@ -1745,7 +1745,7 @@ a {
 
 .community-textarea {
     min-height: 320px;
-    resize: vertical;
+    resize: none;
     line-height: 1.6;
 }
 
