@@ -451,6 +451,10 @@ a {
   background: #f4f4f4;
 }
 
+:root[data-theme="dark"] .history-menu-action:hover {
+  color: #111111;
+}
+
 .history-menu-action:disabled {
   cursor: default;
 }
@@ -506,6 +510,10 @@ a {
 
 .history-menu-action.danger:hover {
   background: #fef2f2;
+}
+
+:root[data-theme="dark"] .history-menu-action.danger:hover {
+  color: #111111;
 }
 
 .sr-only {
