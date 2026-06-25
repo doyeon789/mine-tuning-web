@@ -138,7 +138,7 @@
 .history-item {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) var(--sidebar-control-size) var(--sidebar-control-size);
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
   border-radius: var(--sidebar-hover-radius);
 }
@@ -149,6 +149,9 @@
 }
 
 .history-favorite-form {
+  position: absolute;
+  top: 0;
+  right: var(--sidebar-control-size);
   display: grid;
   place-items: center;
 }
@@ -195,6 +198,9 @@
 }
 
 .history-menu-button {
+  position: absolute;
+  top: 0;
+  right: 0;
   display: grid;
   place-items: center;
   width: var(--sidebar-control-size);

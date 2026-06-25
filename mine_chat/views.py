@@ -4,13 +4,23 @@ from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
+import logging
 import requests
 import os
+import re
 
 from .forms import ChatMessageForm, ChatSessionForm
 from .models import ChatMessage, ChatSession
 
+logger = logging.getLogger(__name__)
+
 NGROK_URL = os.environ.get("NGROK_URL", "https://eligibly-shove-cartload.ngrok-free.dev")
+TITLE_API_URL = os.environ.get(
+    "TITLE_API_URL",
+    "https://title-api-server.onrender.com/api/titles/",
+)
+TITLE_API_TIMEOUT_SECONDS = float(os.environ.get("TITLE_API_TIMEOUT_SECONDS", "60"))
+TITLE_API_MAX_ATTEMPTS = 2
 SESSION_TITLE_MAX_LENGTH = 32
 
 
@@ -59,7 +69,49 @@ def _call_rag_api(question: str) -> str:
         return f"API 연결 오류: {str(e)}"
     
 
-def _create_assistant_response(session):
+def _normalize_generated_title(title):
+    if not isinstance(title, str):
+        return ""
+
+    title = " ".join(title.split()).strip()
+    title = title.strip("\"'`“”‘’[](){}")
+    title = re.sub(r"[?!.,。！？]+$", "", title).strip()
+    return title[:SESSION_TITLE_MAX_LENGTH].rstrip()
+
+
+def _call_title_api(question, answer):
+    last_error = None
+
+    for attempt in range(1, TITLE_API_MAX_ATTEMPTS + 1):
+        try:
+            response = requests.post(
+                TITLE_API_URL,
+                json={
+                    "question": question,
+                    "answer": answer,
+                },
+                timeout=TITLE_API_TIMEOUT_SECONDS,
+            )
+            response.raise_for_status()
+            data = response.json()
+            if not isinstance(data, dict):
+                return ""
+            return _normalize_generated_title(data.get("title"))
+        except (requests.RequestException, ValueError, TypeError) as error:
+            last_error = error
+            logger.warning(
+                "Title API request failed (attempt %s/%s): %s",
+                attempt,
+                TITLE_API_MAX_ATTEMPTS,
+                error,
+            )
+
+    if last_error:
+        raise last_error
+    return ""
+
+
+def _create_assistant_response(session, update_title=False):
     last_user_message = session.messages.filter(
         role=ChatMessage.Role.USER
     ).last()
@@ -69,11 +121,26 @@ def _create_assistant_response(session):
     else:
         answer = "질문을 찾을 수 없습니다."
 
-    return ChatMessage.objects.create(
+    assistant_message = ChatMessage.objects.create(
         session=session,
         role=ChatMessage.Role.ASSISTANT,
         content=answer,
     )
+
+    if update_title and last_user_message:
+        try:
+            generated_title = _call_title_api(
+                last_user_message.content,
+                answer,
+            )
+        except (requests.RequestException, ValueError, TypeError):
+            generated_title = ""
+
+        if generated_title:
+            session.title = generated_title
+            session.save(update_fields=["title"])
+
+    return assistant_message
 
 
 def _delete_messages_after(user_message):
@@ -129,7 +196,7 @@ def session_create(request):
     message.session = session
     message.role = ChatMessage.Role.USER
     message.save()
-    _create_assistant_response(session)
+    _create_assistant_response(session, update_title=True)
 
     return redirect("mine_chat:session_detail", pk=session.pk)
 

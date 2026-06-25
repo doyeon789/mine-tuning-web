@@ -11,6 +11,10 @@ services:
         generateValue: true
       - key: WEB_CONCURRENCY
         value: "4"
+      - key: TITLE_API_URL
+        value: "https://title-api-server.onrender.com/api/titles/"
+      - key: TITLE_API_TIMEOUT_SECONDS
+        value: "60"
       - key: DATABASE_URL
         fromDatabase:
           name: mine-tuning-db
