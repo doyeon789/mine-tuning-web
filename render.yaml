@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: mine-tuning-web
+    runtime: python
+    buildCommand: bash build.sh
+    startCommand: gunicorn mine_tuning.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: "4"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mine-tuning-db
+          property: connectionString
+
+databases:
+  - name: mine-tuning-db
+    databaseName: mine_tuning
+    user: mine_tuning
