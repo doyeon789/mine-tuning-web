@@ -5,6 +5,7 @@ import requests
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.html import escape
 from django.utils import timezone
 
 from .models import ChatMessage, ChatSession
@@ -30,7 +31,7 @@ class ChatViewsTests(TestCase):
         response = self.client.get(reverse("mine_chat:index"), {"new": "1"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Where should we begin?")
+        self.assertContains(response, escape(response.context["auth_splash"]))
         self.assertContains(response, "data-chat-submit-form")
         self.assertContains(response, "data-pending-response-host")
         self.assertContains(response, "data-first-chat")
