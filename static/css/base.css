@@ -1,0 +1,136 @@
+/* Global tokens and base elements */
+:root {
+  --color-carbon: #0d0d0d;
+  --color-snow: #ffffff;
+  --color-fog: #f9f9f9;
+  --color-pewter: #5d5d5d;
+  --color-stone: #8f8f8f;
+  --color-arctic-mist: #ececec;
+  --color-history-hover: rgba(0, 0, 0, 0.035);
+  --color-moss: #2f6f4e;
+  --color-moss-soft: #e6f1ea;
+  --color-moss-wash: #f4f8f5;
+  --color-line-soft: rgba(47, 111, 78, 0.16);
+  --color-link-blue: #007aff;
+  --color-pin-yellow: #f7c948;
+  --color-pin-yellow-soft: #fff6cc;
+  --color-pin-brown: #7a4f00;
+  --color-menu-hover: #f4f4f4;
+  --color-on-light: #111111;
+  --color-danger: #ef4444;
+  --color-danger-soft: #fef2f2;
+  --sidebar-hover-radius: 10px;
+  --sidebar-control-size: 32px;
+  --font-ui-sans-serif:
+    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Noto Sans KR", sans-serif;
+  --font-openai-sans:
+    "OpenAI Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+
+  color: #171717;
+  background: #ffffff;
+  font-family: var(--font-ui-sans-serif);
+  font-size: 17px;
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --color-carbon: #f4f7f5;
+  --color-snow: #121712;
+  --color-fog: #171f19;
+  --color-pewter: #b1beb5;
+  --color-stone: #7f9186;
+  --color-arctic-mist: #243027;
+  --color-history-hover: rgba(255, 255, 255, 0.08);
+  --color-moss: #9bd3ad;
+  --color-moss-soft: #1e3427;
+  --color-moss-wash: #111a14;
+  --color-line-soft: rgba(155, 211, 173, 0.22);
+  --color-link-blue: #8ab4ff;
+  --color-pin-yellow: #f7d36d;
+  --color-pin-yellow-soft: #3c3215;
+  --color-pin-brown: #f7d36d;
+
+  color: var(--color-carbon);
+  background: var(--color-snow);
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--color-snow);
+  color: var(--color-carbon);
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+.theme-toggle {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-stone);
+  opacity: 0.62;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease,
+    opacity 120ms ease;
+}
+
+.theme-toggle:hover {
+  border-color: var(--color-line-soft);
+  background: var(--color-moss-soft);
+  color: var(--color-moss);
+  opacity: 1;
+}
+
+.theme-toggle-icon {
+  grid-area: 1 / 1;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+}
+
+.theme-toggle-moon,
+:root[data-theme="dark"] .theme-toggle-sun {
+  opacity: 0;
+  transform: scale(0.72);
+}
+
+:root[data-theme="dark"] .theme-toggle-moon {
+  opacity: 1;
+  transform: scale(1);
+}
+
